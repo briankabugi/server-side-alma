@@ -163,7 +163,7 @@ app.get('/findEnterprise/:userId', async (req, res) => {
         const userId = req.params.userId;
 
         // Find the enterprises created by that user ID
-        const enterprises = await Enterprise.find({ 'info.createdBy': userId });
+        const enterprises = await Enterprise.find({ 'info.created_by': userId });
 
         // Send the response as JSON
         res.status(200).json(enterprises);
