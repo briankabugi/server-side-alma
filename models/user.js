@@ -4,17 +4,13 @@ const userSchema = mongoose.Schema({
         type: {},
         required: true
     },
-    enterprises: {
-        type: [String],
-        default: []
-    },
     favorites: {
         type: {},
         default: {}
     },
     messages: {
-        type: [],
-        default: []
+        type: {},
+        default: {}
     },
     preferences: {
         type: {},

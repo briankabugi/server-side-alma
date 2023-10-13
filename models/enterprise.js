@@ -2,12 +2,16 @@ const mongoose = require('mongoose')
 
 const EnterpriseSchema = new mongoose.Schema({
     info: {
-        type: [],
+        type: {},
         required: true
     },
 	employees: {
         type: [],
-        required: true
+        default: []
+    },
+    customers: {
+        type: [],
+        default: []
     },
     product_categories : {
         type: [],

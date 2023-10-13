@@ -72,7 +72,7 @@ app.post('/login', async (req, res) => {
                 const token = jwt.sign({ userId: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
                 res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, enterprises: user.enterprises, preferences: user.preferences })
             } else {
-                res.status(200).json({ id: 2, message: `Invalid Password for ${user.name}` })
+                res.status(200).json({ id: 2, message: `Invalid Password for ${user.info.name}` })
             }
         } else {
             res.status(200).json({ id: 3, message: 'User Not Found' })
@@ -93,7 +93,7 @@ app.get('/findUser/:userId', async (req, res) => {
         const user = await User.findOne({ _id: userId });
 
         // Send the response as JSON
-        res.status(200).json({ name: user.name, contact: user.contact, image: user.image, location: user.location });
+        res.status(200).json({ info: user.info});
     } catch (err) {
         // Handle any errors
         res.status(500).send(err.message);
@@ -146,10 +146,7 @@ app.post('/createEnterprise', async (req, res) => {
 
     // Create New user Object
     const createdEnterprise = await new Enterprise(newEnterprise)
-    const userID = newEnterprise.createdBy
-    const user = await User.findById(userID);
-    user.enterprises.push(createdEnterprise._id)
-    await user.save()
+    
     //Save to database
     createdEnterprise.save().then(() => {
         res.status(200).json({ message: 'Your Enterprise was created successfully' })
