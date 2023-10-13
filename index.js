@@ -44,10 +44,10 @@ const User = require('./models/user')
 
 app.post('/register', (req, res) => {
     //Extract Parameters
-    const { name, contact, password, location } = req.body
+    const { info } = req.body
 
     // Create New user Object
-    const newUser = new User({ name, contact, password, location })
+    const newUser = new User({ info })
 
     //Save to database
     newUser.save().then(() => {

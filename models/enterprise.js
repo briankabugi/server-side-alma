@@ -1,59 +1,23 @@
 const mongoose = require('mongoose')
 
 const EnterpriseSchema = new mongoose.Schema({
-    name: {
-        type: String,
+    info: {
+        type: [],
         required: true
-    },
-	category: {
-        type: String,
-        required: true
-    },
-	location: {
-        type: String,
-        required: true
-    },
-	longitude: {
-        type: Number,
-        required: true
-    },
-	latitude: {
-        type: Number,
-        required: true
-    },
-	successful_trades: {
-        type: Number,
-        default: 0
     },
 	employees: {
-        type: Number,
+        type: [],
         required: true
     },
-    phone: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    createdBy: {
-        type: String,
-        required: true
-    },
-    images: {
-        type: [String],
+    product_categories : {
+        type: [],
         default: []
     },
-    placeholder: {
-        type: String,
-        default: ''
+    sales: {
+        type: [],
+        default: []
     },
-    categories : {
+    messages: {
         type: [],
         default: []
     }
