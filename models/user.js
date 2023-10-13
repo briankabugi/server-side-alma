@@ -15,6 +15,10 @@ const userSchema = mongoose.Schema({
     messages: {
         type: [],
         default: []
+    },
+    preferences: {
+        type: {},
+        default: {}
     }
 })
 

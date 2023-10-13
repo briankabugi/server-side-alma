@@ -66,11 +66,11 @@ app.post('/login', async (req, res) => {
 
     // Validate the input
     try {
-        const user = await User.findOne({ 'contact.phone.primary': phone });
+        const user = await User.findOne({ 'info.contact.phone1': phone });
         if (user) {
-            if (user.password === password) {
+            if (user.info.password === password) { 
                 const token = jwt.sign({ userId: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-                res.status(200).json({ id: 1, userID: user._id, name: user.name, token: token })
+                res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, enterprises: user.enterprises, preferences: user.preferences })
             } else {
                 res.status(200).json({ id: 2, message: `Invalid Password for ${user.name}` })
             }
