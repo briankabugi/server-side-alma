@@ -236,8 +236,8 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
             res.status(404).json({ error: 'Enterprise not found' });
         } else {
 
-            enterprise.categories = categories
-            enterprise.images = images
+            enterprise.product_categories = categories
+            enterprise.info.images = images
             // Update other properties as needed
 
             // Save the updated enterprise
