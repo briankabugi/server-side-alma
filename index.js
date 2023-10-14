@@ -38,13 +38,13 @@ app.listen(port, () => {
 })
 
 
-// Registration Endpoint
+// Register
 
 const User = require('./models/user')
 
 app.post('/register', (req, res) => {
     //Extract Parameters
-    const { info } = req.body
+    const info = req.body
 
     // Create New user Object
     const newUser = new User({ info })
@@ -59,14 +59,14 @@ app.post('/register', (req, res) => {
     })
 })
 
-// Login Endpoint
+// Login
 app.post('/login', async (req, res) => {
     // Get the email and password from the request body
     const { phone, password } = req.body;
 
     // Validate the input
     try {
-        const user = await User.findOne({ 'info.contact.phone1': phone });
+        const user = await User.findOne({ 'info.contact.phone': phone });
         if (user) {
             if (user.info.password === password) {
                 const token = jwt.sign({ userId: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
@@ -113,12 +113,12 @@ app.put('/updateUser/:id', async (req, res) => {
             try {
                 user.info = updatedInfo;
 
-                // Save the updated enterprise
+                // Save the updated User
                 await user.save();
 
-                return res.status(200).json({ message: 'Saved' })
-            } catch(error){
-                return res.status(500).json({ error: error.message})
+                res.status(200).json({ message: 'Saved' })
+            } catch (error) {
+                res.status(500).json({ error: error.message })
             }
 
         }
@@ -132,13 +132,13 @@ app.put('/updateUser/:id', async (req, res) => {
 app.delete('/deleteUser/:id', async (req, res) => {
     try {
         await User.deleteOne({ _id: req.params.id });
-        res.status(200).json({ message: 'Goodbye. See you again soon' });
+        res.status(200).json({ message: 'Account Deleted' });
     } catch (err) {
         res.status(500).json({ message: 'Error on Server Side' });
     }
 });
 
-// Launch EnterPrise Endpoint
+// Launch EnterPrise
 
 const Enterprise = require('./models/enterprise')
 
@@ -151,14 +151,14 @@ app.post('/createEnterprise', async (req, res) => {
 
     //Save to database
     createdEnterprise.save().then(() => {
-        res.status(200).json({ message: 'Your Enterprise was created successfully' })
+        res.status(200).json({ message: 'Launch Successful' })
     }).catch((error) => {
         console.log('Could not create Enterprise', error)
         res.status(500).json({ message: 'Could not create enterprise' })
     })
 })
 
-// Find Enterprise Endpoint
+// Find Enterprise
 app.get('/findEnterprise/:userId', async (req, res) => {
     try {
         // Get the user ID from the params
@@ -175,7 +175,7 @@ app.get('/findEnterprise/:userId', async (req, res) => {
     }
 });
 
-// Locate Enterprise Endpoint 
+// Locate Enterprise
 app.get('/locateEnterprise/:name', async (req, res) => {
     try {
         // Get the user ID from the params
@@ -220,7 +220,7 @@ app.put('/updateEnterpriseInfo/:id', async (req, res) => {
     }
 })
 
-// Update Product Info
+// Update Enterprise Data
 app.put('/updateEnterpriseData/:id', async (req, res) => {
     const { categories, images } = req.body; // The updated enterprise data
     const id = req.params.id
@@ -249,7 +249,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
     }
 })
 
-// Delete User
+// Delete Enterprise
 app.delete('/deleteEnterprise/:id', async (req, res) => {
     try {
         await Enterprise.deleteOne({ _id: req.params.id });
@@ -258,23 +258,6 @@ app.delete('/deleteEnterprise/:id', async (req, res) => {
         res.status(500).json({ message: 'Error on Server Side' });
     }
 });
-
-// Assistant Endpoint 
-const openai = new OpenAI({ apiKey: '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' })
-
-app.post('/assistant', async (req, res) => {
-    await openai.completions.create({
-        model: "text-davinci-003",
-        prompt: req.body.prompt,
-        max_tokens: 7,
-        temperature: 0
-    }).then((data) => {
-        res.status(200).json({ message: data.data.choices[0] })
-    }).catch((error) => {
-        res.status(400).json({ message: "Request Failed" })
-    })
-})
-
 
 
 
