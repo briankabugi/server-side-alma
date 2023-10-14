@@ -193,7 +193,7 @@ app.get('/locateEnterprise/:name', async (req, res) => {
 
 // Update Enterprise Info
 app.put('/updateEnterpriseInfo/:id', async (req, res) => {
-    const { name, category, location, password, contact, logo } = req.body; // The updated enterprise data
+    const info = req.body; // The updated enterprise data
 
     try {
         const enterprise = await Enterprise.findById(req.params.id);
@@ -203,18 +203,13 @@ app.put('/updateEnterpriseInfo/:id', async (req, res) => {
         }
 
         // Update the enterprise with the new data
-        enterprise.info.name = name;
-        enterprise.info.category = category;
-        enterprise.info.location = location;
-        enterprise.info.password = password
-        enterprise.info.contact = contact
-        enterprise.info.logo = logo
+        enterprise.info = info
 
         // Save the updated enterprise
         await enterprise.save().then(()=>{
             res.json({ message: 'Saved' });
         }).catch((error)=>{
-            res.status(500).json({message: 'Failed to save'})
+            res.status(500).json({message: error.message })
         });;
 
     } catch (error) {
