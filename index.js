@@ -194,10 +194,9 @@ app.get('/locateEnterprise/:name', async (req, res) => {
 // Update Enterprise Info
 app.put('/updateEnterpriseInfo/:id', async (req, res) => {
     const { name, category, location, password, contact, logo } = req.body; // The updated enterprise data
-    const id = req.params.id
 
     try {
-        const enterprise = await Enterprise.findById(id);
+        const enterprise = await Enterprise.findById(req.params.id);
 
         if (!enterprise) {
             return res.status(404).json({ error: 'Enterprise not found' });
@@ -213,9 +212,9 @@ app.put('/updateEnterpriseInfo/:id', async (req, res) => {
 
         // Save the updated enterprise
         await enterprise.save().then(()=>{
-            res.json({ message: 'Info Updated' });
+            res.json({ message: 'Saved' });
         }).catch((error)=>{
-            res.status(500).json({message: 'Failed to update info'})
+            res.status(500).json({message: 'Failed to save'})
         });;
 
     } catch (error) {
