@@ -111,15 +111,15 @@ app.put('/updateUser/:id', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         } else {
             user.info = updatedInfo;
+
+            // Save the updated enterprise
+            await user.save();
+
+            return res.status(200).json({ message: 'Saved' })
         }
 
-        // Save the updated enterprise
-        await user.save();
-
-        return res.status(200).json({ message: 'Saved' })
     } catch (error) {
-        console.error('Error updating user', error);
-        return res.status(500).json({ error: 'We were unable to update your details at the moment' });
+        return res.status(500).json({ error: error.message });
     }
 })
 
