@@ -191,8 +191,8 @@ app.get('/locateEnterprise/:name', async (req, res) => {
 });
 
 // Update Enterprise Info
-app.put('/updateEnterpriseInfo', async (req, res) => {
-    const { id, name, category, email, phone, placeholder, location, longitude, latitude } = req.body; // The updated enterprise data
+app.put('/updateEnterpriseInfo/:id', async (req, res) => {
+    const { name, category, location, password, contact, logo } = req.body; // The updated enterprise data
 
     try {
         const enterprise = await Enterprise.findById(id);
@@ -202,15 +202,13 @@ app.put('/updateEnterpriseInfo', async (req, res) => {
         }
 
         // Update the enterprise with the new data
-        enterprise.name = name;
-        enterprise.category = category;
-        enterprise.email = email;
-        enterprise.phone = phone
-        enterprise.placeholder = placeholder
-        enterprise.location = location
-        enterprise.longitude = longitude
-        enterprise.latitude = latitude
-        // Update other properties as needed
+        enterprise.info.name = name;
+        enterprise.info.category = category;
+        enterprise.info.location = location;
+        enterprise.info.password = password
+        enterprise.info.contact = contact
+        enterprise.info.logo = logo
+
         // Save the updated enterprise
         await enterprise.save().then(()=>{
             res.json({ message: 'Info Updated' });
@@ -257,7 +255,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 app.delete('/deleteEnterprise/:id', async (req, res) => {
     try {
         await Enterprise.deleteOne({ _id: req.params.id });
-        res.status(200).json({})
+        res.status(200).json({message: 'Enterprise Deleted Successfully'})
     } catch (err) {
         res.status(500).json({ message: 'Error on Server Side' });
     }
