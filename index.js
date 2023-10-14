@@ -102,7 +102,7 @@ app.get('/findUser/:userId', async (req, res) => {
 
 // Update User
 app.put('/updateUser/:id', async (req, res) => {
-    const { name, image, email, phone } = req.body; // The updated enterprise data
+    const { name, image, email, phone, password } = req.body; // The updated enterprise data
 
     try {
         const user = await User.findById(req.params.id);
@@ -110,16 +110,17 @@ app.put('/updateUser/:id', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
-            user.name = name;
-            user.image = image;
-            user.phone = phone;
-            user.email = email
+            user.info.name = name;
+            user.info.image = image;
+            user.info.phone = phone;
+            user.info.email = email;
+            user.info.password = password
         }
 
         // Save the updated enterprise
         await user.save();
 
-        return res.status(200).json({})
+        return res.status(200).json({message: 'Saved'})
     } catch (error) {
         console.error('Error updating user', error);
         return res.status(500).json({ error: 'We were unable to update your details at the moment' });
@@ -193,6 +194,7 @@ app.get('/locateEnterprise/:name', async (req, res) => {
 // Update Enterprise Info
 app.put('/updateEnterpriseInfo/:id', async (req, res) => {
     const { name, category, location, password, contact, logo } = req.body; // The updated enterprise data
+    const id = req.params.id
 
     try {
         const enterprise = await Enterprise.findById(id);
