@@ -52,7 +52,7 @@ app.post('/register', (req, res) => {
     //Save to database
     newUser.save().then(() => {
         const token = jwt.sign({ userId: newUser._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-        res.status(200).json({ userID:  newUser._id, token: token })
+        res.status(200).json({ userID: newUser._id, token: token })
     }).catch((error) => {
         console.log('Could not create Account', error)
         res.status(500).json({ message: 'Could not create account' })
@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ 'info.contact.phone1': phone });
         if (user) {
-            if (user.info.password === password) { 
+            if (user.info.password === password) {
                 const token = jwt.sign({ userId: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
                 res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, enterprises: user.enterprises, preferences: user.preferences })
             } else {
@@ -93,7 +93,7 @@ app.get('/findUser/:userId', async (req, res) => {
         const user = await User.findOne({ _id: userId });
 
         // Send the response as JSON
-        res.status(200).json({ info: user.info});
+        res.status(200).json({ info: user.info });
     } catch (err) {
         // Handle any errors
         res.status(500).send(err.message);
@@ -102,7 +102,7 @@ app.get('/findUser/:userId', async (req, res) => {
 
 // Update User
 app.put('/updateUser/:id', async (req, res) => {
-    const { name, image, email, phone, password } = req.body; // The updated enterprise data
+    const updatedInfo = req.body; // The updated enterprise data
 
     try {
         const user = await User.findById(req.params.id);
@@ -110,21 +110,17 @@ app.put('/updateUser/:id', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
-            user.info.name = name;
-            user.info.image = image;
-            user.info.phone = phone;
-            user.info.email = email;
-            user.info.password = password
+            user.info = updatedInfo;
         }
 
         // Save the updated enterprise
         await user.save();
 
-        return res.status(200).json({message: 'Saved'})
+        return res.status(200).json({ message: 'Saved' })
     } catch (error) {
         console.error('Error updating user', error);
         return res.status(500).json({ error: 'We were unable to update your details at the moment' });
-    } 2354
+    }
 })
 
 // Delete User 
@@ -147,7 +143,7 @@ app.post('/createEnterprise', async (req, res) => {
 
     // Create New user Object
     const createdEnterprise = await new Enterprise(newEnterprise)
-    
+
     //Save to database
     createdEnterprise.save().then(() => {
         res.status(200).json({ message: 'Your Enterprise was created successfully' })
@@ -170,7 +166,7 @@ app.get('/findEnterprise/:userId', async (req, res) => {
         res.status(200).json(enterprises);
     } catch (error) {
         // Handle any errors
-        res.status(500).json({message: error.message});
+        res.status(500).json({ message: error.message });
     }
 });
 
@@ -181,7 +177,7 @@ app.get('/locateEnterprise/:name', async (req, res) => {
         const name = req.params.name;
 
         // Find the enterprises created by that user ID
-        const enterprise = await Enterprise.findOne({ name: name });
+        const enterprise = await Enterprise.findOne({ 'info.name': name });
 
         // Send the response as JSON
         res.status(200).json(enterprise);
@@ -199,17 +195,18 @@ app.put('/updateEnterpriseInfo/:id', async (req, res) => {
         const enterprise = await Enterprise.findById(req.params.id);
 
         if (!enterprise) {
+            // Return 404 error
             return res.status(404).json({ error: 'Enterprise not found' });
+        } else {
+            // Update the enterprise with the new data
+            enterprise.info = info
         }
 
-        // Update the enterprise with the new data
-        enterprise.info = info
-
         // Save the updated enterprise
-        await enterprise.save().then(()=>{
+        await enterprise.save().then(() => {
             res.json({ message: 'Saved' });
-        }).catch((error)=>{
-            res.status(500).json({message: error.message })
+        }).catch((error) => {
+            res.status(500).json({ message: error.message })
         });;
 
     } catch (error) {
@@ -220,7 +217,7 @@ app.put('/updateEnterpriseInfo/:id', async (req, res) => {
 
 // Update Product Info
 app.put('/updateEnterpriseData/:id', async (req, res) => {
-    const {categories, images} = req.body; // The updated enterprise data
+    const { categories, images } = req.body; // The updated enterprise data
     const id = req.params.id
 
     try {
@@ -235,10 +232,10 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
             // Update other properties as needed
 
             // Save the updated enterprise
-            await enterprise.save().then(()=>{
+            await enterprise.save().then(() => {
                 res.status(200).json({ message: 'Backend Save Successful' });
-            }).catch((error)=>{
-                res.status(500).json({message: 'Failed to save data'})
+            }).catch((error) => {
+                res.status(500).json({ message: 'Failed to save data' })
             });
         }
     } catch (error) {
@@ -251,7 +248,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 app.delete('/deleteEnterprise/:id', async (req, res) => {
     try {
         await Enterprise.deleteOne({ _id: req.params.id });
-        res.status(200).json({message: 'Enterprise Deleted Successfully'})
+        res.status(200).json({ message: 'Enterprise Deleted Successfully' })
     } catch (err) {
         res.status(500).json({ message: 'Error on Server Side' });
     }
