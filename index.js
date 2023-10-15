@@ -250,7 +250,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 
 // Get Nearest Enterprises
 app.get('/nearest-documents', async (req, res) => {
-    const { x, y } = req.body
+    const { x, y } = req.query
 
     // Find all documents
     const allDocs = await Enterprise.find();
