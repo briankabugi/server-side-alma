@@ -249,7 +249,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 })
 
 // Get Nearest Enterprises
-app.get('/nearMe', async (req, res) => {
+app.get('/near', async (req, res) => {
     const { x, y, limit } = req.query
 
     // Find all documents
