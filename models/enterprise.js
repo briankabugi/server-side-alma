@@ -24,6 +24,18 @@ const EnterpriseSchema = new mongoose.Schema({
     messages: {
         type: [],
         default: []
+    },
+    reviews: {
+        type: [],
+        default: []
+    },
+    statistics: {
+        type : {},
+        default: {}
+    },
+    communities: {
+        type: [],
+        default: []
     }
 })
 
