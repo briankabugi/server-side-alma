@@ -253,7 +253,8 @@ app.get('/nearbyEnterprises', async (req, res) => {
     const { x, y, limit } = req.query
 
     // Find all documents
-    const allDocs = await Enterprise.find();
+    const allDocs = await Enterprise.find()
+        .select('info product_categories reviews statistics communities');
 
     try {
         // Calculate distances
@@ -285,18 +286,19 @@ app.get('/nearbyEnterprises', async (req, res) => {
 // Get Popular Enterprises
 app.get('/popularEnterprises', (req, res) => {
     const { limit } = req.query;
-    
+
     // Query the database for the 10 most popular documents based on popularity
     Enterprise.find()
-      .sort({ 'statistics.popularity': -1 })
-      .limit(parseInt(limit))
-      .then(documents => {
-        res.status(200).json(documents);
-      })
-      .catch(error => {
-        res.status(500).json({ error: error.message });
-      });
-  });
+        .select('info product_categories reviews statistics communities')
+        .sort({ 'statistics.popularity': -1 })
+        .limit(parseInt(limit))
+        .then(documents => {
+            res.status(200).json(documents);
+        })
+        .catch(error => {
+            res.status(500).json({ error: error.message });
+        });
+});
 
 // Delete Enterprise
 app.delete('/deleteEnterprise/:id', async (req, res) => {
