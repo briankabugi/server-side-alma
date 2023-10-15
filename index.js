@@ -249,6 +249,37 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
     }
 })
 
+// Get Nearest Enterprises
+app.get('/nearest-documents', async (req, res) => {
+  const { x, y } = req.body
+
+  // Find all documents
+  const allDocs = await Enterprise.find({});
+
+  // Calculate distances between each document's x1 and y1 values and x2 and y2 values
+  const docsWithDistances = allDocs.map(doc => {
+    const { latitude, longitude } = doc.info.location;
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (x - latitude) * Math.PI / 180;
+    const dLon = (y - longitude) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return { ...doc.toObject(), distance };
+  });
+
+  // Sort documents by their calculated distances in ascending order
+  docsWithDistances.sort((a, b) => a.distance - b.distance);
+
+  // Return the top n documents
+  const n = 10;
+  const nearestDocs = docsWithDistances.slice(0, n);
+  res.json(nearestDocs);
+});
+
 // Delete Enterprise
 app.delete('/deleteEnterprise/:id', async (req, res) => {
     try {
