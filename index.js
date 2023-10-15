@@ -249,8 +249,8 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 })
 
 // Get Nearest Enterprises
-app.get('/nearest-documents', async (req, res) => {
-    const { x, y } = req.query
+app.get('/nearMe', async (req, res) => {
+    const { x, y, limit } = req.query
 
     // Find all documents
     const allDocs = await Enterprise.find();
@@ -275,13 +275,29 @@ app.get('/nearest-documents', async (req, res) => {
         docsWithDistances.sort((a, b) => a.distance - b.distance);
 
         // Return the top n documents
-        const n = 10;
-        const nearestDocs = docsWithDistances.slice(0, n);
+        const nearestDocs = docsWithDistances.slice(0, limit);
         res.json(nearestDocs);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Get Popular Enterprises
+app.get('/popular/:limit', (req, res) => {
+    const {limit} = req.params
+    // Query the database for the 10 most popular documents based on popularity
+    Document.find()
+      .sort({ 'statistics.popularity': -1 }) // Sort in descending order of popularity
+      .limit(limit) // Limit the result to 10 documents
+      .exec((error, documents) => {
+        if (error) {
+          console.error('Error querying documents:', error);
+          res.status(500).json({ error: 'An error occurred' });
+        } else {
+          res.json(documents);
+        }
+      });
+  });
 
 // Delete Enterprise
 app.delete('/deleteEnterprise/:id', async (req, res) => {
