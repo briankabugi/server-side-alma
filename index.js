@@ -291,7 +291,7 @@ app.get('/popularEnterprises', (req, res) => {
         .limit(parseInt(limit))
         .exec((error, documents) => {
             if (error) {
-                res.status(500).json({ error: 'An error occurred' });
+                res.status(200).json({ error: error.message });
             } else {
                 res.status(200).json(documents);
             }
