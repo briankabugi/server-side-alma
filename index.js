@@ -284,19 +284,19 @@ app.get('/nearbyEnterprises', async (req, res) => {
 
 // Get Popular Enterprises
 app.get('/popularEnterprises', (req, res) => {
-    const { limit } = req.query
+    const { limit } = req.query;
+    
     // Query the database for the 10 most popular documents based on popularity
     Enterprise.find()
-        .sort({ 'statistics.popularity': -1 })
-        .limit(parseInt(limit))
-        .exec((error, documents) => {
-            if (error) {
-                res.status(200).json({ error: error.message });
-            } else {
-                res.status(200).json(documents);
-            }
-        });
-});
+      .sort({ 'statistics.popularity': -1 })
+      .limit(parseInt(limit))
+      .then(documents => {
+        res.status(200).json(documents);
+      })
+      .catch(error => {
+        res.status(200).json({ error: error.message });
+      });
+  });
 
 // Delete Enterprise
 app.delete('/deleteEnterprise/:id', async (req, res) => {
