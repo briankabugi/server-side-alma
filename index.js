@@ -288,7 +288,7 @@ app.get('/popularEnterprise', (req, res) => {
     // Query the database for the 10 most popular documents based on popularity
     Document.find()
       .sort({ 'statistics.popularity': -1 }) // Sort in descending order of popularity
-      .limit(limit) // Limit the result to 10 documents
+      .limit(parseInt(limit)) // Limit the result to 10 documents
       .exec((error, documents) => {
         if (error) {
           console.error('Error querying documents:', error);
