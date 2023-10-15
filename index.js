@@ -284,7 +284,7 @@ app.get('/nearestEnterprise', async (req, res) => {
 
 // Get Popular Enterprises
 app.get('/popularEnterprise/:limit', (req, res) => {
-    const {limit} = req.params
+    const limit = req.query
     // Query the database for the 10 most popular documents based on popularity
     Document.find()
       .sort({ 'statistics.popularity': -1 }) // Sort in descending order of popularity
