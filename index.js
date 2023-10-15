@@ -249,7 +249,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 })
 
 // Get Nearest Enterprises
-app.get('/nearestEnterprise', async (req, res) => {
+app.get('/nearbyEnterprises', async (req, res) => {
     const { x, y, limit } = req.query
 
     // Find all documents
@@ -283,17 +283,17 @@ app.get('/nearestEnterprise', async (req, res) => {
 });
 
 // Get Popular Enterprises
-app.get('/popularEnterprise', (req, res) => {
+app.get('/popularEnterprises', (req, res) => {
     const { limit } = req.query;
     // Query the database for the 10 most popular documents based on popularity
     Document.find()
       .sort({ 'statistics.popularity': -1 }) // Sort in descending order of popularity
-      .limit(parseInt(limit)) // Limit the result to 10 documents
+      .limit(10) // Limit the result to 10 documents
       .exec((error, documents) => {
         if (error) {
           res.status(500).json({ error: 'An error occurred' });
         } else {
-          res.json(documents);
+          res.status(200).json(documents);
         }
       });
   });  
