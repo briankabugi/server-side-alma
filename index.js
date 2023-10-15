@@ -283,7 +283,7 @@ app.get('/nearestEnterprise', async (req, res) => {
 });
 
 // Get Popular Enterprises
-app.get('/popularEnterprise/:limit', (req, res) => {
+app.get('/popularEnterprise', (req, res) => {
     const {limit} = req.query
     // Query the database for the 10 most popular documents based on popularity
     Document.find()
