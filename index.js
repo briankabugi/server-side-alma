@@ -249,7 +249,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 })
 
 // Get Nearest Enterprises
-app.get('/near', async (req, res) => {
+app.get('/nearestEnterprise', async (req, res) => {
     const { x, y, limit } = req.query
 
     // Find all documents
@@ -283,7 +283,7 @@ app.get('/near', async (req, res) => {
 });
 
 // Get Popular Enterprises
-app.get('/popular/:limit', (req, res) => {
+app.get('/popularEnterprise/:limit', (req, res) => {
     const {limit} = req.params
     // Query the database for the 10 most popular documents based on popularity
     Document.find()
