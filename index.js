@@ -261,7 +261,7 @@ app.get('/nearest-documents', async (req, res) => {
             const { latitude, longitude } = doc.info.location;
             const R = 6371; // Radius of the Earth in kilometers
             const dLat = (x - latitude) * Math.PI / 180;
-            const dLon = (y - longitude) * Math.PI / 180;  // Corrected typo: (y - longitude) instead of (longitude - y)
+            const dLon = (y - longitude) * Math.PI / 180;
             const a =
                 Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                 Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
@@ -272,7 +272,7 @@ app.get('/nearest-documents', async (req, res) => {
         });
 
         // Sort documents by their calculated distances in ascending order
-        docsWithDistances.sort((b, a) => b.distance - a.distance);
+        docsWithDistances.sort((a, b) => b.distance - a.distance);
 
         // Return the top n documents
         const n = 10;
