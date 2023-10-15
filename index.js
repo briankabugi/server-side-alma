@@ -272,7 +272,7 @@ app.get('/nearest-documents', async (req, res) => {
         });
 
         // Sort documents by their calculated distances in ascending order
-        docsWithDistances.sort((a, b) => a.distance - b.distance);
+        docsWithDistances.sort((a, b) => b.distance - a.distance);
 
         // Return the top n documents
         const n = 10;
