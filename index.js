@@ -254,10 +254,11 @@ app.get('/nearest-documents', async (req, res) => {
 
     // Find all documents
     const allDocs = await Enterprise.find({});
+    const allDocsArray = allDocs.toArray()
 
     try {
         // Calculate distances
-        const docsWithDistances = allDocs.map(doc => {
+        const docsWithDistances = allDocsArray.map(doc => {
             const { latitude, longitude } = doc.info.location;
             const R = 6371; // Radius of the Earth in kilometers
             const dLat = (x - latitude) * Math.PI / 180;
