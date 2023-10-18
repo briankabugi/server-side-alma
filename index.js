@@ -159,7 +159,7 @@ app.post('/createEnterprise', async (req, res) => {
 })
 
 // Find Enterprise
-app.get('/findEnterprise/:userId', async (req, res) => {
+app.get('/findEnterprises/:userId', async (req, res) => {
     try {
         // Get the user ID from the params
         const userId = req.params.userId;
@@ -176,16 +176,20 @@ app.get('/findEnterprise/:userId', async (req, res) => {
 });
 
 // Locate Enterprise
-app.get('/locateEnterprise/:name', async (req, res) => {
+app.get('/locateEnterprise/:id', async (req, res) => {
     try {
-        // Get the user ID from the params
-        const name = req.params.name;
+        // Find the enterprise with that id
+        const enterprise = await Enterprise.findById(id)
+            .select('info product_categories reviews statistics communities');
 
-        // Find the enterprises created by that user ID
-        const enterprise = await Enterprise.findOne({ 'info.name': name });
+        if (enterprise) {
+            // Send the response as JSON
+            res.status(200).json(enterprise);
+        } else {
+            // Send the response as JSON
+            res.status(500).json({ error: 'Enterprise not found' });
+        }
 
-        // Send the response as JSON
-        res.status(200).json(enterprise);
     } catch (err) {
         // Handle any errors
         res.status(500).send(err.message);
