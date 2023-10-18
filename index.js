@@ -179,7 +179,7 @@ app.get('/findEnterprises/:userId', async (req, res) => {
 app.get('/locateEnterprise/:id', async (req, res) => {
     try {
         // Find the enterprise with that id
-        const enterprise = await Enterprise.findById(id)
+        const enterprise = await Enterprise.findById(req.params.id)
             .select('info product_categories reviews statistics communities');
 
         if (enterprise) {
