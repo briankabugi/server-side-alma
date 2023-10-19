@@ -316,20 +316,21 @@ app.delete('/deleteEnterprise/:id', async (req, res) => {
 
 
 // Create Community
-app.post('/createCommunity', async (req, res) => {
-    //Extract Parameters
-    const newCommunity = req.body
+app.post('/createCommunity', (req, res) => {
+    const newCommunityData = req.body;
 
-    // Create New user Object
-    const createdCommunity = await new Community(newCommunity)
+    // Assuming you have imported and defined the Community model
+    const newCommunity = new Community(newCommunityData);
 
-    //Save to database
-    createdCommunity.save().then(() => {
-        res.status(200).json({ message: 'Community Created' })
-    }).catch((error) => {
-        res.status(500).json({ message: error.message})
-    })
-})
+    newCommunity.save((err, savedCommunity) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({ message: 'Failed to create community.' });
+        } else {
+            res.status(200).json({ message: 'Community created successfully.', community: savedCommunity });
+        }
+    });
+});
 
 
 
