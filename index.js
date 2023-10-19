@@ -325,9 +325,9 @@ app.post('/createCommunity', (req, res) => {
     newCommunity.save((err, savedCommunity) => {
         if (err) {
             console.error(err);
-            res.status(500).json({ message: 'Failed to create community.' });
+            res.status(500).json({ message: 'Failed to create community' });
         } else {
-            res.status(200).json({ message: 'Community created successfully.', community: savedCommunity });
+            res.status(200).json({ message: 'Community created successfully' });
         }
     });
 });
