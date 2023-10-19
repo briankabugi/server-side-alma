@@ -322,14 +322,11 @@ app.post('/createCommunity', (req, res) => {
     // Assuming you have imported and defined the Community model
     const newCommunity = new Community(newCommunityData);
 
-    newCommunity.save((err, savedCommunity) => {
-        if (err) {
-            console.error(err);
-            res.status(500).json({ message: 'Failed to create community' });
-        } else {
-            res.status(200).json({ message: 'Community created successfully' });
-        }
-    });
+    newCommunity.save().then(() => {
+        res.status(200).json({ message: 'Community Created' })
+    }).catch((error) => {
+        res.status(200).json({ message: error.message })
+    })
 });
 
 
