@@ -13,6 +13,10 @@ const CommunitySchema = new mongoose.Schema({
         type: string,
         required: true
     },
+    details: {
+        type: {},
+        required: true
+    },
     members: {
         type: [],
         default: []
