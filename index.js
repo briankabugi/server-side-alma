@@ -38,9 +38,12 @@ app.listen(port, () => {
 })
 
 
-// Register
-
+// Importing Models
 const User = require('./models/user')
+const Enterprise = require('./models/enterprise')
+const Community = require('./models/community')
+
+// Register User
 
 app.post('/register', (req, res) => {
     //Extract Parameters
@@ -139,9 +142,6 @@ app.delete('/deleteUser/:id', async (req, res) => {
 });
 
 // Launch EnterPrise
-
-const Enterprise = require('./models/enterprise')
-
 app.post('/createEnterprise', async (req, res) => {
     //Extract Parameters
     const newEnterprise = req.body
@@ -313,6 +313,23 @@ app.delete('/deleteEnterprise/:id', async (req, res) => {
         res.status(500).json({ message: 'Error on Server Side' });
     }
 });
+
+
+// Create Community
+app.post('/createCommunity', async (req, res) => {
+    //Extract Parameters
+    const newCommunity = req.body
+
+    // Create New user Object
+    const createdCommunity = await new Community(newCommunity)
+
+    //Save to database
+    createdCommunity.save().then(() => {
+        res.status(200).json({ message: 'Community Created' })
+    }).catch((error) => {
+        res.status(500).json({ message: error.message})
+    })
+})
 
 
 
