@@ -4,8 +4,6 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy
-const OpenAI = require('openai')
 
 const app = express()
 const port = process.env.PORT
