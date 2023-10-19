@@ -316,15 +316,15 @@ app.delete('/deleteEnterprise/:id', async (req, res) => {
 
 
 // Create Community
-app.post('/createCommunity', (req, res) => {
+app.post('/createCommunity', async (req, res) => {
     // Extracting data
     const newCommunityData = req.body;
 
     // Creating Community
-    const newCommunity = new Community(newCommunityData);
+    const newCommunity = await new Community(newCommunityData);
 
     // Saving Community
-    newCommunity.save().then(() => {
+    await newCommunity.save().then(() => {
         res.status(200).json({ message: 'Community Created' })
     }).catch((error) => {
         res.status(500).json({ message: error.message })
