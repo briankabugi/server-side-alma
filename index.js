@@ -327,7 +327,7 @@ app.post('/createCommunity', (req, res) => {
     newCommunity.save().then(() => {
         res.status(200).json({ message: 'Community Created' })
     }).catch((error) => {
-        res.status(200).json({ message: error.message })
+        res.status(500).json({ message: error.message })
     })
 });
 
