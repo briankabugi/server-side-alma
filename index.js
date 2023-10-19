@@ -317,11 +317,13 @@ app.delete('/deleteEnterprise/:id', async (req, res) => {
 
 // Create Community
 app.post('/createCommunity', (req, res) => {
+    // Extracting data
     const newCommunityData = req.body;
 
-    // Assuming you have imported and defined the Community model
+    // Creating Community
     const newCommunity = new Community(newCommunityData);
 
+    // Saving Community
     newCommunity.save().then(() => {
         res.status(200).json({ message: 'Community Created' })
     }).catch((error) => {
