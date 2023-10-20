@@ -39,6 +39,7 @@ app.listen(port, () => {
 // Importing Models
 const User = require('./models/user')
 const Enterprise = require('./models/enterprise')
+const Community = require('./models/community')
 
 // Register User
 
