@@ -346,7 +346,7 @@ app.get('/fetchCommunities', async (req, res) => {
         const AreaDocsWithDistances = AreaDocs.map(doc => {
             total_distance = 0
             for (const location in doc.locations) {
-                const { latitude, longitude } = doc.details.location;
+                const { latitude, longitude } = location;
                 const R = 6371; // Radius of the Earth in kilometers
                 const dLat = (x - latitude) * Math.PI / 180;
                 const dLon = (y - longitude) * Math.PI / 180;
