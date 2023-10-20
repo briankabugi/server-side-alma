@@ -39,7 +39,6 @@ app.listen(port, () => {
 // Importing Models
 const User = require('./models/user')
 const Enterprise = require('./models/enterprise')
-const Community = require('./models/community')
 
 // Register User
 
@@ -311,27 +310,6 @@ app.delete('/deleteEnterprise/:id', async (req, res) => {
         res.status(500).json({ message: 'Error on Server Side' });
     }
 });
-
-
-// Create Community
-app.post('/createCommunity', async (req, res) => {
-    //Extract Parameters
-    const newCommunity = req.body
-
-    try {
-        // Create New user Object
-        const createdCommunity = await new Community(newCommunity)
-
-        //Save to database
-        createdCommunity.save().then(() => {
-            res.status(200).json({ message: 'Community Created' })
-        }).catch((error) => {
-            res.status(500).json({ message: error.message })
-        })
-    } catch (error) {
-        response.status(500).json({ message: error.message })
-    }
-})
 
 
 
