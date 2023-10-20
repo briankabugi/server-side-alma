@@ -224,7 +224,7 @@ app.put('/updateEnterpriseInfo/:id', async (req, res) => {
 
 // Update Enterprise Data
 app.put('/updateEnterpriseData/:id', async (req, res) => {
-    const { categories, images } = req.body; // The updated enterprise data
+    const { categories, images } = req.body;
     const id = req.params.id
 
     try {
@@ -318,15 +318,19 @@ app.post('/createCommunity', async (req, res) => {
     //Extract Parameters
     const newCommunity = req.body
 
-    // Create New user Object
-    const createdCommunity = await new Community(newCommunity)
+    try {
+        // Create New user Object
+        const createdCommunity = await new Community(newCommunity)
 
-    //Save to database
-    createdCommunity.save().then(() => {
-        res.status(200).json({ message: 'Community Created' })
-    }).catch((error) => {
-        res.status(500).json({ message: error.message})
-    })
+        //Save to database
+        createdCommunity.save().then(() => {
+            res.status(200).json({ message: 'Community Created' })
+        }).catch((error) => {
+            res.status(500).json({ message: error.message })
+        })
+    } catch (error) {
+        response.status(500).json({ message: error.message })
+    }
 })
 
 
