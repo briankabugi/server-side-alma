@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const communitySchema = new mongoose.Schema({
+const CommunitySchema = new mongoose.Schema({
     name: {
         type: string,
         required: true
@@ -27,5 +27,5 @@ const communitySchema = new mongoose.Schema({
     }
 })
 
-const Community = mongoose.model('Community', communitySchema)
+const Community = mongoose.model('Community', CommunitySchema)
 module.exports = Community
