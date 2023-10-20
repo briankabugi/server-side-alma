@@ -333,5 +333,54 @@ app.post('/createCommunity', async (req, res) => {
     }
 })
 
+// Fetch Communities
+app.get('/fetchCommunities', async (req, res) => {
+    const { x, y, limit } = req.query
+
+    // Find all documents
+    const AreaDocs = await Community.find({ 'details.category': 'Area' })
+    const GlobalDocs = await Community.find({ 'details.category': 'Global' })
+
+    try {
+        // Calculate distances
+        const AreaDocsWithDistances = AreaDocs.map(doc => {
+            total_distance = 0
+            for (const location in doc.locations) {
+                const { latitude, longitude } = doc.details.location;
+                const R = 6371; // Radius of the Earth in kilometers
+                const dLat = (x - latitude) * Math.PI / 180;
+                const dLon = (y - longitude) * Math.PI / 180;
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c;
+                total_distance += distance
+            }
+            const average_distance = total_distance/focus.locations.length
+            return { ...doc.toObject(), average_distance };
+        });
+
+        // Sort documents by their calculated distances in ascending order
+        AreaDocsWithDistances.sort((a, b) => a.distance - b.distance);
+        GlobalDocs.sort({'details.popularity': -1})
+
+        // Return the top n documents
+        const nearestByArea = AreaDocsWithDistances.slice(0, limit);
+        const nearestByPopularity = GlobalDocs.slice(0,limit)
+
+        // Shuffle Results
+        const communities = nearestByArea.concat(nearestByPopularity)
+        for (let i = combinedList.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [communities[i], communities[j]] = [communities[j], communities[i]];
+          }
+        res.json(communities);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
