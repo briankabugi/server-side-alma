@@ -345,7 +345,7 @@ app.get('/fetchCommunities', async (req, res) => {
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
             total_distance = 0
-            for (const location in doc.locations) {
+            for (const location in doc.details.locations) {
                 const { latitude, longitude } = location;
                 const R = 6371; // Radius of the Earth in kilometers
                 const dLat = (x - latitude) * Math.PI / 180;
@@ -372,7 +372,7 @@ app.get('/fetchCommunities', async (req, res) => {
 
         // Shuffle Results
         const communities = nearestByArea.concat(nearestByPopularity)
-        for (let i = combinedList.length - 1; i > 0; i--) {
+        for (let i = communities.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [communities[i], communities[j]] = [communities[j], communities[i]];
           }
