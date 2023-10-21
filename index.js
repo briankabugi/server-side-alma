@@ -372,11 +372,7 @@ app.get('/fetchCommunities', async (req, res) => {
   
       // Shuffle Results
       const communities = nearestByArea.concat(nearestByPopularity);
-      for (let i = communities.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [communities[i], communities[j]] = [communities[j], communities[i]];
-      }
-      res.json(communities);
+      res.status(200).json(communities);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
