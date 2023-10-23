@@ -40,6 +40,7 @@ app.listen(port, () => {
 const User = require('./models/user')
 const Enterprise = require('./models/enterprise')
 const Community = require('./models/community')
+const Workshop = require('./models/workshop')
 
 // Register User
 
@@ -326,7 +327,7 @@ app.post('/createCommunity', async (req, res) => {
         createdCommunity.save().then(() => {
             res.status(200).json({ message: 'Community Created' })
         }).catch((error) => {
-            res.status(500).json({ message: error.message })
+            res.status(500).json({ error: error.message })
         })
     } catch (error) {
         response.status(500).json({ message: error.message })
@@ -336,47 +337,97 @@ app.post('/createCommunity', async (req, res) => {
 // Fetch Communities
 app.get('/fetchCommunities', async (req, res) => {
     const { x, y, limit } = req.query;
-  
+
     try {
-      // Find all documents
-      const AreaDocs = await Community.find({ 'details.category': 'Area' });
-      const GlobalDocs = await Community.find({ 'details.category': 'Global' });
-  
-      // Calculate distances
-      const AreaDocsWithDistances = AreaDocs.map(doc => {
-        let total_distance = 0;
-        for (const location of doc.details.locations) {
-          const { latitude, longitude } = location;
-          const R = 6371;
-          const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
-          const dLon = (longitude - y) * Math.PI / 180; // Corrected longitude - y
-          const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          const distance = R * c;
-          total_distance += distance;
-        }
-        const average_distance = total_distance / doc.details.locations.length;
-        return { ...doc.toObject(), average_distance };
-      });
-  
-      // Sort documents by their calculated distances in ascending order
-      AreaDocsWithDistances.sort((a, b) => a.average_distance - b.average_distance);
-      GlobalDocs.sort((a, b) => b.details.popularity - a.details.popularity);
-  
-      // Return the top n documents
-      const nearestByArea = AreaDocsWithDistances.slice(0, limit);
-      const nearestByPopularity = GlobalDocs.slice(0, limit);
-  
-      // Shuffle Results
-      const communities = nearestByArea.concat(nearestByPopularity);
-      res.status(200).json(communities);
+        // Find all documents
+        const AreaDocs = await Community.find({ 'details.category': 'Area' });
+        const GlobalDocs = await Community.find({ 'details.category': 'Global' });
+
+        // Calculate distances
+        const AreaDocsWithDistances = AreaDocs.map(doc => {
+            let total_distance = 0;
+            for (const location of doc.details.locations) {
+                const { latitude, longitude } = location;
+                const R = 6371;
+                const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
+                const dLon = (longitude - y) * Math.PI / 180; // Corrected longitude - y
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c;
+                total_distance += distance;
+            }
+            const average_distance = total_distance / doc.details.locations.length;
+            return { ...doc.toObject(), average_distance };
+        });
+
+        // Sort documents by their calculated distances in ascending order
+        const SortedAreaDocs = AreaDocsWithDistances.sort((a, b) => a.average_distance - b.average_distance);
+        const SortedGlobalDocs = GlobalDocs.sort((a, b) => b.details.popularity - a.details.popularity);
+
+        // Return the top n documents
+        const nearestByArea = SortedAreaDocs.slice(0, limit);
+        const nearestByPopularity = SortedGlobalDocs.slice(0, limit);
+
+        // Shuffle Results
+        const communities = nearestByArea.concat(nearestByPopularity);
+        res.status(200).json(communities);
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
-  });
+});
+
+// Create Workshop
+app.post('/createWorkshop', async (req,res)=>{
+     //Extract Parameters
+     const newWorkshop = req.body
+
+     try {
+         // Create New user Object
+         const createdWorkshop = await new Workshop(newWorkshop)
+ 
+         //Save to database
+         createdWorkshop.save().then(() => {
+             res.status(200).json({ message: 'Workshop Created' })
+         }).catch((error) => {
+             res.status(500).json({ error: error.message })
+         })
+     } catch (error) {
+         response.status(500).json({ message: error.message })
+     }
+})
+
+// Fetch Workshops
+app.get('/fetchWorkshops', async (req, res) => {
+    const { x, y, limit } = req.query;
+    try {
+        // Find all documents
+        const Workshops = await Workshop.find();
+
+        // Calculate distances
+        const WorkshopsWithDistances = Workshops.map(doc => {
+            const { latitude, longitude } = doc.location;
+            const R = 6371;
+            const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
+            const dLon = (longitude - y) * Math.PI / 180; // Corrected longitude - y
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return { ...doc.toObject(), distance };
+        });
+
+        const SortedWorkshops = WorkshopsWithDistances.sort((a, b) => a.distance - b.distance);
+        const nearbyWorkshops = SortedWorkshops.slice( 0, limit)
+        
+        res.status(200).json(nearbyWorkshops)
+    } catch(error){
+        res.status(500).json({ message: error.message })
+}})
 
 
 
