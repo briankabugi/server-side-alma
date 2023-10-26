@@ -256,12 +256,12 @@ app.get('/fetchProducts/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        const enterprise = await Enterprise.findById(id);
+        const enterprise = await Enterprise.findById(id).select('product_categories');
 
         if (!enterprise) {
-            res.status(500).json({ error: 'Enterprise not found' });
+            res.status(404).json({ error: 'Enterprise not found' });
         } else {
-            const productCategories =  enterprise.select('product_categories')
+            const productCategories =  enterprise.product_categories
             res.status(200).json({categories: productCategories})
         }
     } catch (error) {
