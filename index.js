@@ -253,10 +253,16 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 
 // Get Nearest Enterprises
 app.get('/nearbyEnterprises', async (req, res) => {
-    const { x, y, limit } = req.query
+    const { userEnterprises, x, y, limit } = req.query
+
+    let query = {};
+
+    if (userEnterprises.length > 0) {
+        query._id = { $nin: userEnterprises };
+    }
 
     // Find all documents
-    const allDocs = await Enterprise.find()
+    const allDocs = await Enterprise.find(query)
         .select('info product_categories reviews statistics communities');
 
     try {
@@ -288,15 +294,34 @@ app.get('/nearbyEnterprises', async (req, res) => {
 
 // Get Popular Enterprises
 app.get('/popularEnterprises', (req, res) => {
-    const { limit } = req.query;
+    const { userEnterprises, x, y, limit } = req.query;
+
+    let query = {};
+
+    if (userEnterprises.length > 0) {
+        query._id = { $nin: userEnterprises };
+    }
 
     // Query the database for the 10 most popular documents based on popularity
-    Enterprise.find()
+    Enterprise.find(query)
         .select('info product_categories reviews statistics communities')
         .sort({ 'statistics.popularity': -1 })
         .limit(parseInt(limit))
         .then(documents => {
-            res.status(200).json(documents);
+            const documentsWithDistances = documents.map(doc => {
+                const { latitude, longitude } = doc.info.location;
+                const R = 6371; // Radius of the Earth in kilometers
+                const dLat = (x - latitude) * Math.PI / 180;
+                const dLon = (y - longitude) * Math.PI / 180;
+                const a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                const distance = R * c;
+                return { ...doc.toObject(), distance };
+            });
+            res.status(200).json(documentsWithDistances);
         })
         .catch(error => {
             res.status(500).json({ error: error.message });
@@ -307,7 +332,7 @@ app.get('/popularEnterprises', (req, res) => {
 app.delete('/deleteEnterprise/:id', async (req, res) => {
     try {
         await Enterprise.deleteOne({ _id: req.params.id });
-        res.status(200).json({ message: 'Enterprise Deleted Successfully' })
+        res.status(200).json({ message: 'Enterprise Deleted' })
     } catch (err) {
         res.status(500).json({ message: 'Error on Server Side' });
     }
@@ -380,23 +405,23 @@ app.get('/fetchCommunities', async (req, res) => {
 });
 
 // Create Workshop
-app.post('/createWorkshop', async (req,res)=>{
-     //Extract Parameters
-     const newWorkshop = req.body
+app.post('/createWorkshop', async (req, res) => {
+    //Extract Parameters
+    const newWorkshop = req.body
 
-     try {
-         // Create New user Object
-         const createdWorkshop = await new Workshop(newWorkshop)
- 
-         //Save to database
-         createdWorkshop.save().then(() => {
-             res.status(200).json({ message: 'Workshop Created' })
-         }).catch((error) => {
-             res.status(500).json({ error: error.message })
-         })
-     } catch (error) {
-         response.status(500).json({ message: error.message })
-     }
+    try {
+        // Create New user Object
+        const createdWorkshop = await new Workshop(newWorkshop)
+
+        //Save to database
+        createdWorkshop.save().then(() => {
+            res.status(200).json({ message: 'Workshop Created' })
+        }).catch((error) => {
+            res.status(500).json({ error: error.message })
+        })
+    } catch (error) {
+        response.status(500).json({ message: error.message })
+    }
 })
 
 // Fetch Workshops
@@ -422,12 +447,13 @@ app.get('/fetchWorkshops', async (req, res) => {
         });
 
         const SortedWorkshops = WorkshopsWithDistances.sort((a, b) => a.distance - b.distance);
-        const nearbyWorkshops = SortedWorkshops.slice( 0, limit)
-        
+        const nearbyWorkshops = SortedWorkshops.slice(0, limit)
+
         res.status(200).json(nearbyWorkshops)
-    } catch(error){
+    } catch (error) {
         res.status(500).json({ message: error.message })
-}})
+    }
+})
 
 
 
