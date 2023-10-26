@@ -251,6 +251,24 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
     }
 })
 
+// Fetch Enterprise Data
+app.get('/fetchProducts/:id', async (req, res) => {
+    const id = req.params.id
+
+    try {
+        const enterprise = await Enterprise.findById(id);
+
+        if (!enterprise) {
+            res.status(500).json({ error: 'Enterprise not found' });
+        } else {
+            const productCategories =  enterprise.select('product_categories')
+            res.status(200).json({categories: productCategories})
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+})
+
 // Get Popular Enterprises
 app.get('/popularEnterprises', (req, res) => {
     const { userEnterprises, x, y, limit } = req.query;
