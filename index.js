@@ -263,7 +263,7 @@ app.get('/popularEnterprises', (req, res) => {
 
     // Query the database for the 10 most popular documents based on popularity
     Enterprise.find(query)
-        .select('info product_categories reviews statistics communities')
+        .select('_id info reviews statistics communities')
         .sort({ 'statistics.popularity': -1 })
         .limit(parseInt(limit))
         .then(documents => {
@@ -300,7 +300,7 @@ app.get('/nearbyEnterprises', async (req, res) => {
     try {
         // Find all documents
         const allDocs = await Enterprise.find(query)
-            .select('info product_categories reviews statistics communities');
+            .select('_id info reviews statistics communities');
 
         // Calculate distances
         const docsWithDistances = allDocs.map(doc => {
