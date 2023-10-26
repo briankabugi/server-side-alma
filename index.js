@@ -298,8 +298,8 @@ app.get('/popularEnterprises', (req, res) => {
 
     let query = {};
 
-    if (userEnterprises.length > 0) {
-        query._id = { $nin: userEnterprises };
+    if (userEnterprises && userEnterprises.length > 0) {
+        query._id = { $nin: userEnterprises.split(',') };
     }
 
     // Query the database for the 10 most popular documents based on popularity
