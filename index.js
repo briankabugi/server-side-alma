@@ -258,7 +258,7 @@ app.get('/popularEnterprises', (req, res) => {
     let query = {};
 
     if (userEnterprises && userEnterprises.length > 0) {
-        query._id = { $nin: userEnterprises.split(',') };
+        query._id = { $nin: userEnterprises };
     }
 
     // Query the database for the 10 most popular documents based on popularity
@@ -289,19 +289,19 @@ app.get('/popularEnterprises', (req, res) => {
 
 // Get Nearest Enterprises
 app.get('/nearbyEnterprises', async (req, res) => {
-    const { userEnterprises, x, y, limit } = req.query
+    const { userEnterprises, x, y, limit } = req.query;
 
     let query = {};
 
-    if (userEnterprises.length > 0) {
-        query._id = { $nin: userEnterprises.split(',')};
+    if (userEnterprises && userEnterprises.length > 0) {
+        query._id = { $nin: userEnterprises };
     }
 
-    // Find all documents
-    const allDocs = await Enterprise.find(query)
-        .select('info product_categories reviews statistics communities');
-
     try {
+        // Find all documents
+        const allDocs = await Enterprise.find(query)
+            .select('info product_categories reviews statistics communities');
+
         // Calculate distances
         const docsWithDistances = allDocs.map(doc => {
             const { latitude, longitude } = doc.info.location;
