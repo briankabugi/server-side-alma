@@ -241,7 +241,7 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
 
             // Save the updated enterprise
             await enterprise.save().then(() => {
-                res.status(200).json({ message: 'Backend Save Successful' });
+                res.status(200).json({ message: 'Changes Saved' });
             }).catch((error) => {
                 res.status(500).json({ message: 'Failed to save data' })
             });
