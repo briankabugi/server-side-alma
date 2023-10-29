@@ -261,8 +261,8 @@ app.get('/fetchProducts/:id', async (req, res) => {
         if (!enterprise) {
             res.status(404).json({ error: 'Enterprise not found' });
         } else {
-            const productCategories =  enterprise.product_categories
-            res.status(200).json({categories: productCategories})
+            const productCategories = enterprise.product_categories
+            res.status(200).json({ categories: productCategories })
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -476,23 +476,48 @@ app.get('/fetchWorkshops', async (req, res) => {
 // Search Functionality
 app.get('/search/:query', async (req, res) => {
     try {
-      const searchQuery = req.params.query;
-  
-      // Perform the search query
-      const enterprises = await Enterprise.find({
-        $or: [
-          { 'info.name': { $regex: searchQuery, $options: 'i' } },
-          { 'info.category': { $regex: searchQuery, $options: 'i' } },
-        ],
-      }).select('_id info');
-  
-      res.status(200).json(enterprises);
+        const searchQuery = req.params.query;
+
+        // Perform the search query
+        const enterprises = await Enterprise.find({
+            $or: [
+                { 'info.name': { $regex: searchQuery, $options: 'i' } },
+                { 'info.category': { $regex: searchQuery, $options: 'i' } },
+            ],
+        }).select('_id info');
+
+        const products = await Enterprise.aggregate([
+            {
+              $match: {
+                'product_categories.subCategories.products.name': { $regex: searchQuery, $options: 'i' },
+              },
+            },
+            {
+              $project: {
+                products: {
+                  $filter: {
+                    input: '$product_categories.subCategories.products',
+                    as: 'product',
+                    cond: { $regexMatch: { input: '$$product.name', regex: searchQuery, options: 'i' } },
+                  },
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                products: 1,
+              },
+            },
+          ]);
+
+        res.status(200).json({enterprises: enterprises, products: products});
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Server Error' });
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
     }
-  });
-  
+});
+
 
 
 
