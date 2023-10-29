@@ -487,25 +487,24 @@ app.get('/search/:query', async (req, res) => {
         }).select('_id info');
 
         const products = await Enterprise.aggregate([
+            { $unwind: '$product_categories' },
+            { $unwind: '$product_categories.subCategories' },
+            { $unwind: '$product_categories.subCategories.products' },
+            { $match: { 'product_categories.subCategories.products.name': { $regex: searchQuery, $options: 'i' } } },
             {
-              $match: {
-                'product_categories.subCategories.products.name': { $regex: searchQuery, $options: 'i' },
-              },
-            },
-            {
-              $project: {
-                products: {
-                  $filter: {
-                    input: '$product_categories.subCategories.products',
-                    as: 'product',
-                    cond: { $regexMatch: { input: '$$product.name', regex: new RegExp(searchQuery, 'i') } },
-                  },
+                $group: {
+                    _id: null,
+                    products: { $push: '$product_categories.subCategories.products' },
                 },
-              },
             },
-          ]);
+            {
+                $project: {
+                    products: 1,
+                },
+            },
+        ]);
 
-        res.status(200).json({enterprises: enterprises, products: products});
+        res.status(200).json({ enterprises: enterprises, products: products });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
