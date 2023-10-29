@@ -502,13 +502,7 @@ app.get('/search/:query', async (req, res) => {
                   },
                 },
               },
-            },
-            {
-              $project: {
-                _id: 0,
-                products: 1,
-              },
-            },
+            }
           ]);
 
         res.status(200).json({enterprises: enterprises, products: products});
