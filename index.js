@@ -499,7 +499,6 @@ app.get('/search', async (req, res) => {
             },
             {
                 $project: {
-                    _id: 0,
                     products: 1,
                 },
             },
