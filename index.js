@@ -479,12 +479,12 @@ app.get('/search', async (req, res) => {
         const { query, enterpriseLimit, productLimit} = req.query;
 
         // Perform the search query
-        const enterpriseResponse = await Enterprise.find({
+        const enterprises = await Enterprise.find({
             $or: [
                 { 'info.name': { $regex: query, $options: 'i' } },
                 { 'info.category': { $regex: query, $options: 'i' } },
             ],
-        }).select('_id info').limit(parseInt(enterpriseLimit))
+        }).select('_id info')
 
         const products = await Enterprise.aggregate([
             { $unwind: '$product_categories' },
@@ -505,6 +505,7 @@ app.get('/search', async (req, res) => {
             },
         ]);
 
+        const enterpriseResponse = enterprises.slice(0,parseInt(enterpriseLimit))
         const productResponse =  products[0].products.slice(0,parseInt(productLimit))
 
         res.status(200).json({ enterprises: enterpriseResponse, products: productResponse});
