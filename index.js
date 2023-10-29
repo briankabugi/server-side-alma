@@ -473,5 +473,26 @@ app.get('/fetchWorkshops', async (req, res) => {
     }
 })
 
+// Search Functionality
+app.get('/search/:query', async (req, res) => {
+    try {
+      const searchQuery = req.params.query;
+  
+      // Perform the search query
+      const enterprises = await Enterprise.find({
+        $or: [
+          { 'info.name': { $regex: searchQuery, $options: 'i' } },
+          { 'info.category': { $regex: searchQuery, $options: 'i' } },
+        ],
+      }).select('_id info');
+  
+      res.json(enterprises);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  });
+  
+
 
 
