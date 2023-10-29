@@ -476,21 +476,21 @@ app.get('/fetchWorkshops', async (req, res) => {
 // Search Functionality
 app.get('/search/:query', async (req, res) => {
     try {
-        const searchQuery = req.params.query;
+        const { query, enterpriseLimit, productLimit} = req.query;
 
         // Perform the search query
-        const enterprises = await Enterprise.find({
+        const enterpriseResponse = await Enterprise.find({
             $or: [
-                { 'info.name': { $regex: searchQuery, $options: 'i' } },
-                { 'info.category': { $regex: searchQuery, $options: 'i' } },
+                { 'info.name': { $regex: query, $options: 'i' } },
+                { 'info.category': { $regex: query, $options: 'i' } },
             ],
-        }).select('_id info');
+        }).select('_id info').limit(parseInt(enterpriseLimit))
 
         const products = await Enterprise.aggregate([
             { $unwind: '$product_categories' },
             { $unwind: '$product_categories.subCategories' },
             { $unwind: '$product_categories.subCategories.products' },
-            { $match: { 'product_categories.subCategories.products.name': { $regex: searchQuery, $options: 'i' } } },
+            { $match: { 'product_categories.subCategories.products.name': { $regex: query, $options: 'i' } } },
             {
                 $group: {
                     _id: null,
@@ -505,7 +505,9 @@ app.get('/search/:query', async (req, res) => {
             },
         ]);
 
-        res.status(200).json({ enterprises: enterprises, products: products[0].products });
+        const productResponse =  products[0].products.slice(0,productLimit)
+
+        res.status(200).json({ enterprises: enterpriseResponse, products: productResponse});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
