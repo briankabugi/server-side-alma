@@ -498,11 +498,11 @@ app.get('/search/:query', async (req, res) => {
                   $filter: {
                     input: '$product_categories.subCategories.products',
                     as: 'product',
-                    cond: { $regexMatch: { input: '$$product.name', regex: searchQuery, options: 'i' } },
+                    cond: { $regexMatch: { input: '$$product.name', regex: new RegExp(searchQuery, 'i') } },
                   },
                 },
               },
-            }
+            },
           ]);
 
         res.status(200).json({enterprises: enterprises, products: products});
