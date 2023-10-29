@@ -476,7 +476,7 @@ app.get('/fetchWorkshops', async (req, res) => {
 // Search Functionality
 app.get('/search', async (req, res) => {
     try {
-        const { query, enterpriseLimit, productLimit } = req.query;
+        const { query, enterpriseLimit, productLimit, userLimit } = req.query;
 
         // Perform the search query for enterprises
         const enterprises = await Enterprise.find({
@@ -511,7 +511,7 @@ app.get('/search', async (req, res) => {
             $or: [
                 { 'info.name': { $regex: query, $options: 'i' } }
             ],
-        }).select('_id info').limit(Number(enterpriseLimit));
+        }).select('_id info').limit(Number(userLimit));
 
         let productResponse = [];
         if (products.length > 0) {
