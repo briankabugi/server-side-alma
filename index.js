@@ -476,13 +476,13 @@ app.get('/fetchWorkshops', async (req, res) => {
 // Search Functionality
 app.get('/search', async (req, res) => {
     try {
-        const { searchQuery, enterpriseLimit, productLimit } = req.query;
+        const { query, enterpriseLimit, productLimit } = req.query;
 
         // Perform the search query for enterprises
         const enterprises = await Enterprise.find({
             $or: [
-                { 'info.name': { $regex: searchQuery, $options: 'i' } },
-                { 'info.category': { $regex: searchQuery, $options: 'i' } },
+                { 'info.name': { $regex: query, $options: 'i' } },
+                { 'info.category': { $regex: query, $options: 'i' } },
             ],
         }).select('_id info').limit(Number(enterpriseLimit));
 
@@ -491,7 +491,7 @@ app.get('/search', async (req, res) => {
             { $unwind: '$product_categories' },
             { $unwind: '$product_categories.subCategories' },
             { $unwind: '$product_categories.subCategories.products' },
-            { $match: { 'product_categories.subCategories.products.name': { $regex: searchQuery, $options: 'i' } } },
+            { $match: { 'product_categories.subCategories.products.name': { $regex: query, $options: 'i' } } },
             {
                 $group: {
                     _id: null,
@@ -506,12 +506,19 @@ app.get('/search', async (req, res) => {
             },
         ]);
 
+        // Perform the search query for users
+        const users = await User.find({
+            $or: [
+                { 'info.name': { $regex: query, $options: 'i' } }
+            ],
+        }).select('_id info').limit(Number(enterpriseLimit));
+
         let productResponse = [];
         if (products.length > 0) {
             productResponse = products[0].products.slice(0, Number(productLimit));
         }
 
-        res.status(200).json({ enterprises: enterprises, products: productResponse });
+        res.status(200).json({ enterprises: enterprises, products: productResponse, users: users });
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
