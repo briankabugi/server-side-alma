@@ -476,16 +476,17 @@ app.get('/fetchWorkshops', async (req, res) => {
 // Search Functionality
 app.get('/search', async (req, res) => {
     try {
-        const { searchQuery, enterpriseLimit, productLimit} = req.query;
+        const { searchQuery, enterpriseLimit, productLimit } = req.query;
 
-        // Perform the search query
+        // Perform the search query for enterprises
         const enterprises = await Enterprise.find({
             $or: [
                 { 'info.name': { $regex: searchQuery, $options: 'i' } },
                 { 'info.category': { $regex: searchQuery, $options: 'i' } },
             ],
-        }).select('_id info').limit(enterpriseLimit)
+        }).select('_id info').limit(Number(enterpriseLimit));
 
+        // Perform the search query for products using aggregation
         const products = await Enterprise.aggregate([
             { $unwind: '$product_categories' },
             { $unwind: '$product_categories.subCategories' },
@@ -499,14 +500,18 @@ app.get('/search', async (req, res) => {
             },
             {
                 $project: {
+                    _id: 0,
                     products: 1,
                 },
             },
         ]);
 
-        const productResponse =  products[0].products.slice(0,productLimit)
+        let productResponse = [];
+        if (products.length > 0) {
+            productResponse = products[0].products.slice(0, Number(productLimit));
+        }
 
-        res.status(200).json({ enterprises: enterprises, products: productResponse});
+        res.status(200).json({ enterprises: enterprises, products: productResponse });
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
