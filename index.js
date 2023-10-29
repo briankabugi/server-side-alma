@@ -474,7 +474,7 @@ app.get('/fetchWorkshops', async (req, res) => {
 })
 
 // Search Functionality
-app.get('/search', async (req, res) => {
+app.get('/search/:query', async (req, res) => {
     try {
         const { query, enterpriseLimit, productLimit} = req.query;
 
@@ -484,7 +484,7 @@ app.get('/search', async (req, res) => {
                 { 'info.name': { $regex: query, $options: 'i' } },
                 { 'info.category': { $regex: query, $options: 'i' } },
             ],
-        }).select('_id info')
+        }).select('_id info').limit(parseInt(enterpriseLimit))
 
         const products = await Enterprise.aggregate([
             { $unwind: '$product_categories' },
@@ -492,17 +492,22 @@ app.get('/search', async (req, res) => {
             { $unwind: '$product_categories.subCategories.products' },
             { $match: { 'product_categories.subCategories.products.name': { $regex: query, $options: 'i' } } },
             {
+                $group: {
+                    _id: null,
+                    products: { $push: '$product_categories.subCategories.products' },
+                },
+            },
+            {
                 $project: {
                     _id: 0,
                     products: 1,
                 },
-            }
+            },
         ]);
 
-        const enterpriseResponse = enterprises.slice(0,parseInt(enterpriseLimit))
         const productResponse =  products[0].products.slice(0,parseInt(productLimit))
 
-        res.status(200).json({ enterprises: enterpriseResponse, products: productResponse});
+        res.status(200).json({ enterprises: enterprises, products: productResponse});
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
