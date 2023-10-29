@@ -492,17 +492,11 @@ app.get('/search', async (req, res) => {
             { $unwind: '$product_categories.subCategories.products' },
             { $match: { 'product_categories.subCategories.products.name': { $regex: query, $options: 'i' } } },
             {
-                $group: {
-                    _id: null,
-                    products: { $push: '$product_categories.subCategories.products' },
-                },
-            },
-            {
                 $project: {
                     _id: 0,
                     products: 1,
                 },
-            },
+            }
         ]);
 
         const enterpriseResponse = enterprises.slice(0,parseInt(enterpriseLimit))
