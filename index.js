@@ -484,7 +484,7 @@ app.get('/search', async (req, res) => {
                 { 'info.name': { $regex: searchQuery, $options: 'i' } },
                 { 'info.category': { $regex: searchQuery, $options: 'i' } },
             ],
-        }).select('_id info').limit(parseInt(enterpriseLimit))
+        }).select('_id info').limit(enterpriseLimit)
 
         const products = await Enterprise.aggregate([
             { $unwind: '$product_categories' },
@@ -505,7 +505,7 @@ app.get('/search', async (req, res) => {
             },
         ]);
 
-        const productResponse =  products[0].products.slice(0,parseInt(productLimit))
+        const productResponse =  products[0].products.slice(0,productLimit)
 
         res.status(200).json({ enterprises: enterprises, products: productResponse});
     } catch (error) {
