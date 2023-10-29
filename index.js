@@ -481,8 +481,8 @@ app.get('/search', async (req, res) => {
         // Perform the search query for enterprises
         const enterprises = await Enterprise.find({
             $or: [
-                { 'info.name': { $regex: query, $options: 'i' } },
-                { 'info.category': { $regex: query, $options: 'i' } },
+                { 'info.name': { $regex: query.replace(/&/g, '\\&'), $options: 'i' } },
+                { 'info.category': { $regex: query.replace(/&/g, '\\&'), $options: 'i' } },
             ],
         }).select('_id info reviews statistics communities').limit(Number(enterpriseLimit));
 
