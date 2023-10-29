@@ -474,7 +474,7 @@ app.get('/fetchWorkshops', async (req, res) => {
 })
 
 // Search Functionality
-app.get('/search/:query', async (req, res) => {
+app.get('/search', async (req, res) => {
     try {
         const { query, enterpriseLimit, productLimit} = req.query;
 
