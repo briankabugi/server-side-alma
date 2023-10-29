@@ -484,7 +484,7 @@ app.get('/search', async (req, res) => {
                 { 'info.name': { $regex: query, $options: 'i' } },
                 { 'info.category': { $regex: query, $options: 'i' } },
             ],
-        }).select('_id info').limit(Number(enterpriseLimit));
+        }).select('_id info reviews statistics communities').limit(Number(enterpriseLimit));
 
         // Perform the search query for products using aggregation
         const products = await Enterprise.aggregate([
