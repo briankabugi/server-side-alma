@@ -505,7 +505,7 @@ app.get('/search/:query', async (req, res) => {
             },
         ]);
 
-        res.status(200).json({ enterprises: enterprises, products: products });
+        res.status(200).json({ enterprises: enterprises, products: products[0].products });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
