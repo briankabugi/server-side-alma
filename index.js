@@ -486,7 +486,7 @@ app.get('/search/:query', async (req, res) => {
         ],
       }).select('_id info');
   
-      res.json(enterprises);
+      res.status(200).json(enterprises);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Server Error' });
