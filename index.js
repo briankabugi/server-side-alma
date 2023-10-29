@@ -505,7 +505,7 @@ app.get('/search/:query', async (req, res) => {
             },
         ]);
 
-        const productResponse =  products[0].products.slice(0,productLimit)
+        const productResponse =  products[0].products.slice(0,parseInt(productLimit))
 
         res.status(200).json({ enterprises: enterpriseResponse, products: productResponse});
     } catch (error) {
