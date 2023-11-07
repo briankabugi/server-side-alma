@@ -85,6 +85,12 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Fetch All User
+app.get('/fetchUsers', async (req, res) => {
+    const users = User.find()
+    res.status(200).json({users: users})
+})
+
 // Find User
 app.get('/findUser/:userId', async (req, res) => {
     try {
