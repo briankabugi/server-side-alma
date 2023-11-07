@@ -87,8 +87,12 @@ app.post('/login', async (req, res) => {
 
 // Fetch All User
 app.get('/fetchUsers', async (req, res) => {
-    const users = User.find()
-    res.status(200).json({users: users})
+    try {
+        const users = await User.find({})
+        res.status(200).json({ users: users })
+    } catch (error){
+        res.status(500).message('Internal Server Error')
+    }
 })
 
 // Find User
