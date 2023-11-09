@@ -32,7 +32,7 @@ mongoose.connect(
 })
 
 // Listen for port
-const server = app.listen(port, () => {
+const app_server = app.listen(port, () => {
     console.log('Server running on port: ', port)
 })
 
@@ -91,7 +91,7 @@ app.get('/fetchUsers', async (req, res) => {
     try {
         const users = await User.find({})
         res.status(200).json({ users: users })
-    } catch (error){
+    } catch (error) {
         res.status(500).message('Internal Server Error')
     }
 })
@@ -536,7 +536,11 @@ app.get('/search', async (req, res) => {
 });
 
 // Initialize web socket
-const wss = new ws.WebSocketServer({server})
+const web_server = new ws.WebSocketServer({ app_server })
+
+web_server.on('connection', (connection) => {
+    console.log(connection, 'Connection detected');
+});
 
 
 
