@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
+const ws = require('ws')
 
 const app = express()
 const port = process.env.PORT
@@ -31,7 +32,7 @@ mongoose.connect(
 })
 
 // Listen for port
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log('Server running on port: ', port)
 })
 
@@ -533,6 +534,11 @@ app.get('/search', async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 });
+
+// Initialize web socket
+const wss = new ws.WebSocketServer({server})
+
+
 
 
 
