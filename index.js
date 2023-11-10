@@ -52,7 +52,7 @@ app.post('/register', (req, res) => {
 
     //Save to database
     newUser.save().then(() => {
-        const token = jwt.sign({ userId: newUser._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
+        const token = jwt.sign({ userID: newUser._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
         res.status(200).json({ userID: newUser._id, token: token })
     }).catch((error) => {
         console.log('Could not create Account', error)
@@ -70,7 +70,7 @@ app.post('/login', async (req, res) => {
         const user = await User.findOne({ 'info.contact.phone': phone });
         if (user) {
             if (user.info.password === password) {
-                const token = jwt.sign({ userId: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
+                const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
                 res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences })
             } else {
                 res.status(200).json({ id: 2, message: `Invalid Password for ${user.info.name}` })
