@@ -113,7 +113,7 @@ app.get('/nearbyUsers', async (req, res) => {
 
         // Return the top n documents
         const nearestUsers = usersWithDistances.slice(0, parseInt(limit));
-        res.status(200).json(nearestUsers);
+        res.status(200).json({nearestUsers:nearestUsers});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
