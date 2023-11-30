@@ -558,6 +558,33 @@ app.get('/search', async (req, res) => {
     }
 });
 
+// Fetch Messages
+app.get('/messages/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Check if user exists
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Fetch all messages sent or received by the user
+        const messages = await Message.find({
+            $or: [{ senderId: userId }, { receiverId: userId }]
+        });
+
+        res.status(200).json(messages);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 
 
