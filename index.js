@@ -562,12 +562,7 @@ app.get('/search', async (req, res) => {
 // Fetch Messages
 app.get('/messages', async (req, res) => {
     try {
-        const { userID } = req.query;
-
-        // Check if user ID is valid
-        if (!mongoose.Types.ObjectId.isValid(userID)) {
-            return res.status(422).json({ message: 'Invalid user ID' });
-        }
+        const { userID } = req.query
 
         // Fetch all messages sent or received by the user
         const messages = await Message.find({
