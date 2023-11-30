@@ -40,6 +40,7 @@ const User = require('./models/user')
 const Enterprise = require('./models/enterprise')
 const Community = require('./models/community')
 const Workshop = require('./models/workshop')
+const Message = require('./models/message')
 
 // Register User
 
