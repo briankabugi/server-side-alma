@@ -84,15 +84,40 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Fetch All User
-app.get('/fetchUsers', async (req, res) => {
+// Get Nearest Users
+app.get('/nearbyUsers', async (req, res) => {
+    const { x, y, limit } = req.query;
+
     try {
-        const users = await User.find({})
-        res.status(200).json({ users: users })
+        // Find all documents
+        const allUsers = await User.find()
+            .select('_id info');
+
+        // Calculate distances
+        const usersWithDistances = allUsers.map(user => {
+            const { latitude, longitude } = user.info.location;
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (x - latitude) * Math.PI / 180;
+            const dLon = (y - longitude) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return { ...user.toObject(), distance };
+        });
+
+        // Sort documents by their calculated distances in ascending order
+        usersWithDistances.sort((a, b) => a.distance - b.distance);
+
+        // Return the top n documents
+        const nearestUsers = usersWithDistances.slice(0, parseInt(limit));
+        res.status(200).json(nearestUsers);
     } catch (error) {
-        res.status(500).message('Internal Server Error')
+        res.status(500).json({ error: error.message });
     }
-})
+});
 
 // Find User
 app.get('/findUser/:userId', async (req, res) => {
