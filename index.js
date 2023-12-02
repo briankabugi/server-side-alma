@@ -42,7 +42,7 @@ const Community = require('./models/community')
 const Workshop = require('./models/workshop')
 const Message = require('./models/message')
 
-// Register User
+// Register User 
 
 app.post('/register', (req, res) => {
     //Extract Parameters
