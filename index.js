@@ -562,19 +562,23 @@ app.get('/search', async (req, res) => {
 // Fetch Messages
 app.get('/messages', async (req, res) => {
     try {
-        const { userID } = req.query
+        // Ensure userID is a string to prevent query injection attacks
+        const userID = String(req.query.userID);
 
         // Fetch all messages sent or received by the user
         const messages = await Message.find({
             $or: [{ sender: userID }, { receiver: userID }]
-        });
+        }).exec(); // Added exec() to properly execute the query
 
-        res.status(200).json({messages: messages});
+        // Send the messages back in the response
+        res.status(200).json({ messages });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: err.message });
+        // Send a more informative error message to the client
+        res.status(500).json({ message: 'An error occurred while fetching messages.' });
     }
 });
+
 
 
 
