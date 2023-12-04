@@ -565,16 +565,13 @@ app.get('/messages', async (req, res) => {
         // Ensure userID is a string to prevent query injection attacks
         const userID = String(req.query.userID);
 
-        // Fetch all messages sent or received by the user
         const messages = await Message.find({
             $or: [{ sender: userID }, { receiver: userID }]
-        }).exec(); // Added exec() to properly execute the query
+        }).exec();
 
-        // Send the messages back in the response
         res.status(200).json({ messages });
+        
     } catch (err) {
-        console.error(err);
-        // Send a more informative error message to the client
         res.status(500).json({ message: 'An error occurred while fetching messages.' });
     }
 });
