@@ -569,7 +569,7 @@ app.get('/messages', async (req, res) => {
             $or: [{ sender: userID }, { receiver: userID }]
         }).exec();
 
-        res.status(200).json({ messages });
+        res.status(200).json({ idReceived: userID});
         
     } catch (err) {
         res.status(500).json({ message: 'An error occurred while fetching messages.' });
