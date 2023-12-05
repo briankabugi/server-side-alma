@@ -9,12 +9,12 @@ const MessageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    content: {
-        type: String,
+    timeScore: {
+        type: Number,
         required: true
     },
-    timeScore: {
-        type: Date,
+    content: {
+        type: String,
         required: true
     }
 })
