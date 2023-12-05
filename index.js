@@ -563,7 +563,7 @@ app.get('/search', async (req, res) => {
 app.get('/fetchMessages', async (req, res) => {
     try {
         // Ensure userID is a string to prevent query injection attacks
-        const userID = String(req.query.userID);
+        const { userID } = req.query
 
         const messages = await Message.find({
             $or: [{ sender: userID }, { receiver: userID }]
