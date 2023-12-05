@@ -567,9 +567,9 @@ app.get('/messages', async (req, res) => {
 
         const messages = await Message.find({
             $or: [{ sender: userID }, { receiver: userID }]
-        }).exec();
+        })
 
-        res.status(200).json({ idReceived: userID});
+        res.status(200).json({ messages: messages});
         
     } catch (err) {
         res.status(500).json({ message: 'An error occurred while fetching messages.' });
