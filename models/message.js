@@ -13,11 +13,11 @@ const MessageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    createdAt: {
+    created_at: {
         type: Date,
         required: true
     },
-    updatedAt: {
+    updated_at: {
         type: Date,
         required: false
     }
