@@ -562,7 +562,7 @@ app.get('/search', async (req, res) => {
 // Fetch Messages
 app.get('/fetchMessages', async (req, res) => {
     try {
-        // Ensure userID is a string to prevent query injection attacks
+        
         const { userID } = req.query
 
         const messages = await Message.find({
