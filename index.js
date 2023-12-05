@@ -560,7 +560,7 @@ app.get('/search', async (req, res) => {
 });
 
 // Fetch Messages
-app.get('/messages', async (req, res) => {
+app.get('/fetchMessages', async (req, res) => {
     try {
         // Ensure userID is a string to prevent query injection attacks
         const userID = String(req.query.userID);
