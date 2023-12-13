@@ -8,7 +8,7 @@ const https = require('https')
 const ws = require('ws')
 
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 3000
 const cors = require('cors')
 app.use(cors())
 
@@ -37,7 +37,6 @@ const Enterprise = require('./models/enterprise')
 const Community = require('./models/community')
 const Workshop = require('./models/workshop')
 const Message = require('./models/message')
-
 
 // Set Up Servers
 const app_server = https.createServer(app)
