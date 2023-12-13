@@ -9,7 +9,7 @@ const http = require('http')
 const ws = require('ws')
 
 const app = express()
-const port = process.env.port
+const port = process.env.PORT
 const cors = require('cors')
 app.use(cors())
 
