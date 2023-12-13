@@ -1,4 +1,3 @@
-require('dotenv').config();
 
 // Initialize Backend
 const express = require('express')
@@ -41,7 +40,6 @@ const Message = require('./models/message')
 
 
 // Set Up Servers
-
 const app_server = https.createServer(app)
 const wss_server = new ws.Server({ server: app_server })
 
@@ -116,6 +114,11 @@ wss_server.on('connection', (socket, req) => {
     })
 })
 
+
+// Listen to port
+app_server.listen(port, () => {
+    console.log('Server running on port: ', port)
+})
 
 // Register User
 app.post('/register', (req, res) => {
