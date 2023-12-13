@@ -47,8 +47,6 @@ app_server.listen(port, () => {
     console.log('Server running on port: ', port)
 })
 
-// Setup Listeners
-
 wss_server.on('connection', (socket, req) => {
     console.log('connection detected on server')
     console.log('n = ', [...wss_server.clients].length)
@@ -673,3 +671,6 @@ app.get('/messages/:userId', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+// Export WebSocket Server
+module.exports = {wss_server, app_server}
