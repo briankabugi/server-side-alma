@@ -1,12 +1,15 @@
+require('dotenv').config();
 
 // Initialize Backend
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
+const http = require('http')
+const ws = require('ws')
 
 const app = express()
-const port = process.env.PORT
+const port = process.env.port
 const cors = require('cors')
 app.use(cors())
 
@@ -14,12 +17,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ limit: "10mb" }))
 app.use(passport.initialize())
 
-
 const jwt = require('jsonwebtoken')
 
 // Connect to Database
 mongoose.connect(
-    'mongodb+srv://corporationlighthouse:JUQfQlkkVeSAOOWF@cluster0.mojqd5l.mongodb.net/',
+    process.env.DATABASE_URL,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -30,11 +32,6 @@ mongoose.connect(
     console.log('Error connecting to Mongo: ', error)
 })
 
-// Listen for port
-app.listen(port, () => {
-    console.log('Server running on port: ', port)
-})
-
 // Importing Models
 const User = require('./models/user')
 const Enterprise = require('./models/enterprise')
@@ -42,8 +39,90 @@ const Community = require('./models/community')
 const Workshop = require('./models/workshop')
 const Message = require('./models/message')
 
-// Register User 
 
+// Set Up Servers
+
+const app_server = http.createServer(app)
+const wss_server = new ws.Server({ server: app_server })
+
+wss_server.on('connection', (socket, req) => {
+    console.log('connection detected on server')
+    console.log('n = ', [...wss_server.clients].length)
+
+    socket.on('message', async message => {
+        const decodedMessage = JSON.parse(message)
+        if (decodedMessage.type === 'verification') {
+            const token = decodedMessage.token
+            jwt.verify(token, process.env.JWT_SECRET_KEY, {}, (error, data) => {
+                if (error) {
+                    socket.close(4001, 'Brian created a one hour session for you and it has Expired')
+                } else {
+                    console.log('Verification Successful')
+                    console.log('JWT DATA')
+                    console.log(data)
+                    socket._id = data.userID
+                    let onlineClients = []
+                    Array.from(wss_server.clients).forEach(client => {
+                        onlineClients.push(client._id)
+                    })
+
+                    Array.from(wss_server.clients).forEach(client => {
+                        client.send(JSON.stringify({
+                            type: 'appendOnline',
+                            message: socket._id
+                        }))
+                    })
+
+                    socket.send(JSON.stringify({
+                        type: 'appendOnline',
+                        message: onlineClients
+                    }))
+                }
+            })
+        }
+        if (decodedMessage.type === 'message') {
+            console.log(decodedMessage, socket._id)
+            console.log('Socket ID', socket._id)
+            const message = new Message({
+                sender: socket._id,
+                receiver: decodedMessage.receiver,
+                content: decodedMessage.content,
+                createdAt: decodedMessage.createdAt
+            });
+            console.log(decodedMessage.timeScore)
+            console.log(typeof(decodedMessage.timeScore))
+            message.save()
+                .then(doc => {
+                    console.log('Message Sent')
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+
+            const ourClient = Array.from(wss_server.clients).find(client => client._id == decodedMessage.receiver)
+            if (ourClient) {
+                ourClient.send(decodedMessage)
+            }
+        }
+    })
+
+    socket.on('close', event => {
+        Array.from(wss_server.clients).forEach(client => {
+            client.send(JSON.stringify({
+                type: 'popOnline',
+                message: socket._id
+            }))
+        })
+    })
+})
+
+
+// Listen to port
+app_server.listen(port, () => {
+    console.log('Server running on port: ', port)
+})
+
+// Register User
 app.post('/register', (req, res) => {
     //Extract Parameters
     const info = req.body
@@ -53,7 +132,7 @@ app.post('/register', (req, res) => {
 
     //Save to database
     newUser.save().then(() => {
-        const token = jwt.sign({ userID: newUser._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
+        const token = jwt.sign({ userID: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
         res.status(200).json({ userID: newUser._id, token: token })
     }).catch((error) => {
         console.log('Could not create Account', error)
@@ -85,6 +164,16 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Fetch All Users
+app.get('/fetchUsers', async (req, res) => {
+    try {
+        const users = await User.find({})
+        res.status(200).json({ users: users })
+    } catch (error) {
+        res.status(500).message('Internal Server Error')
+    }
+})
+
 // Get Nearest Users
 app.get('/nearbyUsers', async (req, res) => {
     const { x, y, limit } = req.query;
@@ -113,12 +202,13 @@ app.get('/nearbyUsers', async (req, res) => {
         usersWithDistances.sort((a, b) => a.distance - b.distance);
 
         // Return the top n documents
-        const nearbyUsers = usersWithDistances.slice(0, parseInt(limit));
-        res.status(200).json({nearbyUsers:nearbyUsers});
+        const nearestUsers = usersWithDistances.slice(0, parseInt(limit));
+        res.status(200).json({ nearestUsers: nearestUsers });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // Find User
 app.get('/findUser/:userId', async (req, res) => {
@@ -559,27 +649,29 @@ app.get('/search', async (req, res) => {
     }
 });
 
-// Fetch Messages
-app.get('/fetchMessages', async (req, res) => {
+// Fetch User Messages
+app.get('/messages/:userId', async (req, res) => {
     try {
-        
-        const { userID } = req.query
+        const { userId } = req.params;
 
+        // Check if user exists
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Fetch all messages sent or received by the user
         const messages = await Message.find({
-            $or: [{ 'sender': userID }, { 'receiver': userID }]
-        })
+            $or: [{ senderId: userId }, { receiverId: userId }]
+        });
 
-        res.status(200).json({ messages: messages});
-        
+        res.status(200).json(messages);
     } catch (err) {
-        res.status(500).json({ message: 'An error occurred while fetching messages.' });
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
-
-
-
-
-
-
-
-
