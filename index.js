@@ -43,6 +43,13 @@ const Message = require('./models/message')
 const app_server = https.createServer(app)
 const wss_server = new ws.Server({ server: app_server })
 
+// Listen to port
+app_server.listen(port, () => {
+    console.log('Server running on port: ', port)
+})
+
+// Setup Listeners
+
 wss_server.on('connection', (socket, req) => {
     console.log('connection detected on server')
     console.log('n = ', [...wss_server.clients].length)
@@ -112,12 +119,6 @@ wss_server.on('connection', (socket, req) => {
             }))
         })
     })
-})
-
-
-// Listen to port
-app_server.listen(port, () => {
-    console.log('Server running on port: ', port)
 })
 
 // Register User
