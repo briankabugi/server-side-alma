@@ -117,11 +117,6 @@ wss_server.on('connection', (socket, req) => {
 })
 
 
-// Listen to port
-app_server.listen(port, () => {
-    console.log('Server running on port: ', port)
-})
-
 // Register User
 app.post('/register', (req, res) => {
     //Extract Parameters
