@@ -672,5 +672,3 @@ app.get('/messages/:userId', async (req, res) => {
     }
 });
 
-// Export WebSocket Server
-module.exports = {wss_server, app_server}
