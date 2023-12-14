@@ -16,6 +16,10 @@ const UserSchema = new mongoose.Schema({
     preferences: {
         type: {},
         default: {}
+    },
+    friends: {
+        type: [],
+        default: []
     }
 })
 
