@@ -4,7 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
-const https = require('https')
+const http = require('http')
 const ws = require('ws')
 
 const app = express()
@@ -39,8 +39,11 @@ const Workshop = require('./models/workshop')
 const Message = require('./models/message')
 
 // Set Up Servers
-const app_server = https.createServer(app)
+const app_server = http.createServer(app)
 
+app_server.listen(port=>{
+    console.log('Server Listening on port ', port)
+})
 
 // Register User
 app.post('/register', (req, res) => {
