@@ -573,9 +573,9 @@ app.get('/search', async (req, res) => {
 });
 
 // Fetch User Messages
-app.get('/fetchMessages/:userID', async (req, res) => {
+app.get('/fetchMessages', async (req, res) => {
     try {
-        const { userID } = req.params;
+        const { userID } = req.query;
 
         const user = await User.findById(userID);
         if (!user) {
