@@ -4,9 +4,11 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
+const http = require('http')
+const ws = require('ws')
 
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 3000
 const cors = require('cors')
 app.use(cors())
 
@@ -14,12 +16,11 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json({ limit: "10mb" }))
 app.use(passport.initialize())
 
-
 const jwt = require('jsonwebtoken')
 
 // Connect to Database
 mongoose.connect(
-    'mongodb+srv://corporationlighthouse:JUQfQlkkVeSAOOWF@cluster0.mojqd5l.mongodb.net/',
+    process.env.DATABASE_URL,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -30,11 +31,6 @@ mongoose.connect(
     console.log('Error connecting to Mongo: ', error)
 })
 
-// Listen for port
-app.listen(port, () => {
-    console.log('Server running on port: ', port)
-})
-
 // Importing Models
 const User = require('./models/user')
 const Enterprise = require('./models/enterprise')
@@ -42,8 +38,14 @@ const Community = require('./models/community')
 const Workshop = require('./models/workshop')
 const Message = require('./models/message')
 
-// Register User 
+// Set Up Servers
+const app_server = http.createServer(app)
 
+app_server.listen(port=>{
+    console.log('Server Listening on port ', port)
+})
+
+// Register User
 app.post('/register', (req, res) => {
     //Extract Parameters
     const info = req.body
@@ -53,7 +55,7 @@ app.post('/register', (req, res) => {
 
     //Save to database
     newUser.save().then(() => {
-        const token = jwt.sign({ userID: newUser._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
+        const token = jwt.sign({ userID: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
         res.status(200).json({ userID: newUser._id, token: token })
     }).catch((error) => {
         console.log('Could not create Account', error)
@@ -85,6 +87,16 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Fetch All Users
+app.get('/fetchUsers', async (req, res) => {
+    try {
+        const users = await User.find({})
+        res.status(200).json({ users: users })
+    } catch (error) {
+        res.status(500).message('Internal Server Error')
+    }
+})
+
 // Get Nearest Users
 app.get('/nearbyUsers', async (req, res) => {
     const { x, y, limit } = req.query;
@@ -113,12 +125,13 @@ app.get('/nearbyUsers', async (req, res) => {
         usersWithDistances.sort((a, b) => a.distance - b.distance);
 
         // Return the top n documents
-        const nearbyUsers = usersWithDistances.slice(0, parseInt(limit));
-        res.status(200).json({nearbyUsers:nearbyUsers});
+        const nearestUsers = usersWithDistances.slice(0, parseInt(limit));
+        res.status(200).json({ nearestUsers: nearestUsers });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // Find User
 app.get('/findUser/:userId', async (req, res) => {
@@ -559,27 +572,25 @@ app.get('/search', async (req, res) => {
     }
 });
 
-// Fetch Messages
-app.get('/fetchMessages', async (req, res) => {
+// Fetch User Messages
+app.get('/fetchMessages/:userID', async (req, res) => {
     try {
-        
-        const { userID } = req.query
+        const { userID } = req.params;
 
+        const user = await User.findById(userID);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Fetch all messages sent or received by the user
         const messages = await Message.find({
-            $or: [{ 'sender': userID }, { 'receiver': userID }]
-        })
+            $or: [{ senderId: userID }, { receiverId: userID }]
+        });
 
-        res.status(200).json({ messages: messages});
-        
+        res.status(200).json(messages);
     } catch (err) {
-        res.status(500).json({ message: 'An error occurred while fetching messages.' });
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
     }
 });
-
-
-
-
-
-
-
 
