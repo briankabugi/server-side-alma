@@ -594,3 +594,23 @@ app.get('/fetchMessages', async (req, res) => {
     }
 });
 
+// Add Message
+app.post('/addMessage', async (req, res) => {
+    const { sender, receiver, createdAt } = req.body;
+
+    const newMessage = new Message({
+        sender,
+        receiver,
+        createdAt
+    });
+
+    try {
+        await newMessage.save();
+        res.json({ message: 'Message Sent' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message : 'Server error' });
+    }
+});
+
+
