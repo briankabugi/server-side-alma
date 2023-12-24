@@ -596,11 +596,12 @@ app.get('/fetchMessages', async (req, res) => {
 
 // Add Message
 app.post('/addMessage', async (req, res) => {
-    const { sender, receiver, createdAt } = req.body;
+    const { sender, receiver, content,  createdAt } = req.body;
 
     const newMessage = new Message({
         sender,
         receiver,
+        content,
         createdAt
     });
 
