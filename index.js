@@ -573,18 +573,18 @@ app.get('/search', async (req, res) => {
 });
 
 // Fetch User Messages
-app.get('/fetchMessages/:userId', async (req, res) => {
+app.get('/fetchMessages/:userID', async (req, res) => {
     try {
-        const { userId } = req.params;
+        const { userID } = req.params;
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userID);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Fetch all messages sent or received by the user
         const messages = await Message.find({
-            $or: [{ senderId: userId }, { receiverId: userId }]
+            $or: [{ senderId: userID }, { receiverId: userID }]
         });
 
         res.status(200).json(messages);
