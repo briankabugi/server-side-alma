@@ -584,7 +584,7 @@ app.get('/fetchMessages', async (req, res) => {
 
         // Fetch all messages sent or received by the user
         const messages = await Message.find({
-            $or: [{ senderId: userID }, { receiverId: userID }]
+            $or: [{ sender: userID }, { receiver: userID }]
         });
 
         res.status(200).json({messages: messages});
