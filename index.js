@@ -587,7 +587,7 @@ app.get('/fetchMessages', async (req, res) => {
             $or: [{ senderId: userID }, { receiverId: userID }]
         });
 
-        res.status(200).json({messages: messages.push({userID})});
+        res.status(200).json({messages: messages});
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
