@@ -573,14 +573,9 @@ app.get('/search', async (req, res) => {
 });
 
 // Fetch User Messages
-app.get('/messages/:userId', async (req, res) => {
+app.get('/fetchMessages/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
-
-        // Check if user exists
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: 'Invalid user ID' });
-        }
 
         const user = await User.findById(userId);
         if (!user) {
@@ -598,3 +593,4 @@ app.get('/messages/:userId', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
