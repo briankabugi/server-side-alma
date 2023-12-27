@@ -42,7 +42,7 @@ const Message = require('./models/message')
 // Set Up Servers
 const app_server = http.createServer(app)
 
-app_server.listen(port=>{
+app_server.listen(port => {
     console.log('Server Listening on port ', port)
 })
 
@@ -56,7 +56,7 @@ app.post('/register', async (req, res) => {
     const hashedCode = await bcrypt.hash(code, 10);
 
     // Create New user Object
-    const newUser = new User({ info : userData.info, code: hashedCode })
+    const newUser = new User({ info: userData.info, code: hashedCode })
 
     //Save to database
     newUser.save().then(() => {
@@ -77,13 +77,14 @@ app.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ 'info.contact.phone': phone });
         if (user) {
-            const verified = bcrypt.compare(code, user.code)
-            if (verified) {
-                const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-                res.status(200).json({ userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences, friends: user.friends })
-            } else {
-                res.status(500).json({ message: 'Check password and try again' })
-            }
+            bcrypt.compare(code, user.code).then(verified => {
+                if (verified) {
+                    const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
+                    res.status(200).json({ userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences, friends: user.friends })
+                } else {
+                    res.status(500).json({ message: 'Check password and try again' })
+                }
+            });
         } else {
             res.status(500).json({ message: 'User Not Found' })
         }
@@ -219,7 +220,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
 
         // Find the Companies created by that user ID
         const Companies = await Company.find({ 'info.created_by': userId })
-        .select('info ');
+            .select('info ');
 
         // Send the response as JSON
         res.status(200).json(Companies);
@@ -594,7 +595,7 @@ app.get('/fetchMessages', async (req, res) => {
             $or: [{ sender: userID }, { receiver: userID }]
         });
 
-        res.status(200).json({messages: messages});
+        res.status(200).json({ messages: messages });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
@@ -603,7 +604,7 @@ app.get('/fetchMessages', async (req, res) => {
 
 // Add Message
 app.post('/addMessage', async (req, res) => {
-    const { sender, receiver, content,  createdAt } = req.body;
+    const { sender, receiver, content, createdAt } = req.body;
 
     const newMessage = new Message({
         sender,
@@ -617,7 +618,7 @@ app.post('/addMessage', async (req, res) => {
         res.json({ message: 'Message Sent' });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message : 'Server error' });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
