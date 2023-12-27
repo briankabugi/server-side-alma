@@ -9,10 +9,6 @@ const UserSchema = new mongoose.Schema({
         type: {},
         default: {}
     },
-    messages: {
-        type: {},
-        default: {}
-    },
     preferences: {
         type: {},
         default: {}
