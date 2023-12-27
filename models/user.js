@@ -20,6 +20,14 @@ const UserSchema = new mongoose.Schema({
     friends: {
         type: [],
         default: []
+    },
+    events: {
+        type: [],
+        default: []
+    },
+    code: {
+        type: String,
+        required: true
     }
 })
 

@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const passport = require('passport')
+const bcrypt = require('bcrypt');
 const http = require('http')
 const ws = require('ws')
 
@@ -33,9 +34,9 @@ mongoose.connect(
 
 // Importing Models
 const User = require('./models/user')
-const Enterprise = require('./models/enterprise')
+const Company = require('./models/company')
 const Community = require('./models/community')
-const Workshop = require('./models/workshop')
+const Workshop = require('./models/event')
 const Message = require('./models/message')
 
 // Set Up Servers
@@ -46,12 +47,16 @@ app_server.listen(port=>{
 })
 
 // Register User
-app.post('/register', (req, res) => {
+app.post('/register', async (req, res) => {
     //Extract Parameters
-    const info = req.body
+    const userData = req.body
+    const code = userData.code
+
+    // Hash the password
+    const hashedCode = await bcrypt.hash(code, 10);
 
     // Create New user Object
-    const newUser = new User({ info })
+    const newUser = new User({ info : userData.info, code: hashedCode })
 
     //Save to database
     newUser.save().then(() => {
@@ -66,20 +71,21 @@ app.post('/register', (req, res) => {
 // Login
 app.post('/login', async (req, res) => {
     // Get the email and password from the request body
-    const { phone, password } = req.body;
+    const { phone, code } = req.body;
 
     // Validate the input
     try {
         const user = await User.findOne({ 'info.contact.phone': phone });
         if (user) {
-            if (user.info.password === password) {
+            const verified = bcrypt.compare(code, user.code)
+            if (verified) {
                 const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-                res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences })
+                res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences, friends: user.friends })
             } else {
-                res.status(200).json({ id: 2, message: `Invalid Password for ${user.info.name}` })
+                res.status(500).json({ id: 2, message: `Invalid Password for ${user.info.name}` })
             }
         } else {
-            res.status(200).json({ id: 3, message: 'User Not Found' })
+            res.status(500).json({ id: 3, message: 'User Not Found' })
         }
     } catch (error) {
         // Handle any database errors
@@ -139,7 +145,7 @@ app.get('/findUser/:userId', async (req, res) => {
         // Get the user ID from the params
         const userId = req.params.userId;
 
-        // Find the enterprises created by that user ID
+        // Find the User
         const user = await User.findOne({ _id: userId });
 
         // Send the response as JSON
@@ -152,7 +158,7 @@ app.get('/findUser/:userId', async (req, res) => {
 
 // Update User
 app.put('/updateUser/:id', async (req, res) => {
-    const updatedInfo = req.body; // The updated enterprise data
+    const updatedInfo = req.body; // The updated Company data
 
     try {
         const user = await User.findById(req.params.id);
@@ -188,53 +194,54 @@ app.delete('/deleteUser/:id', async (req, res) => {
     }
 });
 
-// Launch EnterPrise
-app.post('/createEnterprise', async (req, res) => {
+// Launch Company
+app.post('/createCompany', async (req, res) => {
     //Extract Parameters
-    const newEnterprise = req.body
+    const newCompany = req.body
 
     // Create New user Object
-    const createdEnterprise = await new Enterprise(newEnterprise)
+    const createdCompany = await new Company(newCompany)
 
     //Save to database
-    createdEnterprise.save().then(() => {
+    createdCompany.save().then(() => {
         res.status(200).json({ message: 'Launch Successful' })
     }).catch((error) => {
-        console.log('Could not create Enterprise', error)
-        res.status(500).json({ message: 'Could not create enterprise' })
+        console.log('Could not create Company', error)
+        res.status(500).json({ message: 'Could not create Company' })
     })
 })
 
-// Find Enterprise
-app.get('/findEnterprises/:userId', async (req, res) => {
+// Find Company
+app.get('/findCompanies/:userId', async (req, res) => {
     try {
         // Get the user ID from the params
         const userId = req.params.userId;
 
-        // Find the enterprises created by that user ID
-        const enterprises = await Enterprise.find({ 'info.created_by': userId });
+        // Find the Companies created by that user ID
+        const Companies = await Company.find({ 'info.created_by': userId })
+        .select('info ');
 
         // Send the response as JSON
-        res.status(200).json(enterprises);
+        res.status(200).json(Companies);
     } catch (error) {
         // Handle any errors
         res.status(500).json({ message: error.message });
     }
 });
 
-// Locate Enterprise
-app.get('/locateEnterprise/:id', async (req, res) => {
+// Locate Company
+app.get('/locateCompany/:id', async (req, res) => {
     try {
-        // Find the enterprise with that id
-        const enterprise = await Enterprise.findById(req.params.id)
+        // Find the Company with that id
+        const Company = await Company.findById(req.params.id)
             .select('info product_categories reviews statistics communities');
 
-        if (enterprise) {
+        if (Company) {
             // Send the response as JSON
-            res.status(200).json(enterprise);
+            res.status(200).json(Company);
         } else {
             // Send the response as JSON
-            res.status(500).json({ error: 'Enterprise not found' });
+            res.status(500).json({ error: 'Company not found' });
         }
 
     } catch (err) {
@@ -243,52 +250,52 @@ app.get('/locateEnterprise/:id', async (req, res) => {
     }
 });
 
-// Update Enterprise Info
-app.put('/updateEnterpriseInfo/:id', async (req, res) => {
-    const info = req.body; // The updated enterprise data
+// Update Company Info
+app.put('/updateCompanyInfo/:id', async (req, res) => {
+    const info = req.body; // The updated Company data
 
     try {
-        const enterprise = await Enterprise.findById(req.params.id);
+        const Company = await Company.findById(req.params.id);
 
-        if (!enterprise) {
+        if (!Company) {
             // Return 404 error
-            return res.status(404).json({ error: 'Enterprise not found' });
+            return res.status(404).json({ error: 'Company not found' });
         } else {
-            // Update the enterprise with the new data
-            enterprise.info = info
+            // Update the Company with the new data
+            Company.info = info
         }
 
-        // Save the updated enterprise
-        await enterprise.save().then(() => {
+        // Save the updated Company
+        await Company.save().then(() => {
             res.json({ message: 'Saved' });
         }).catch((error) => {
             res.status(500).json({ message: error.message })
         });;
 
     } catch (error) {
-        console.error('Error updating enterprise:', error);
+        console.error('Error updating Company:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 })
 
-// Update Enterprise Data
-app.put('/updateEnterpriseData/:id', async (req, res) => {
+// Update Company Data
+app.put('/updateCompanyData/:id', async (req, res) => {
     const { categories, images } = req.body;
     const id = req.params.id
 
     try {
-        const enterprise = await Enterprise.findById(id);
+        const Company = await Company.findById(id);
 
-        if (!enterprise) {
-            res.status(404).json({ error: 'Enterprise not found' });
+        if (!Company) {
+            res.status(404).json({ error: 'Company not found' });
         } else {
 
-            enterprise.product_categories = categories
-            enterprise.info.images = images
+            Company.product_categories = categories
+            Company.info.images = images
             // Update other properties as needed
 
-            // Save the updated enterprise
-            await enterprise.save().then(() => {
+            // Save the updated Company
+            await Company.save().then(() => {
                 res.status(200).json({ message: 'Changes Saved' });
             }).catch((error) => {
                 res.status(500).json({ message: 'Failed to save data' })
@@ -299,17 +306,17 @@ app.put('/updateEnterpriseData/:id', async (req, res) => {
     }
 })
 
-// Fetch Enterprise Data
+// Fetch Company Data
 app.get('/fetchProducts/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        const enterprise = await Enterprise.findById(id).select('product_categories');
+        const Company = await Company.findById(id).select('product_categories');
 
-        if (!enterprise) {
-            res.status(404).json({ error: 'Enterprise not found' });
+        if (!Company) {
+            res.status(404).json({ error: 'Company not found' });
         } else {
-            const productCategories = enterprise.product_categories
+            const productCategories = Company.product_categories
             res.status(200).json({ categories: productCategories })
         }
     } catch (error) {
@@ -317,18 +324,18 @@ app.get('/fetchProducts/:id', async (req, res) => {
     }
 })
 
-// Get Popular Enterprises
-app.get('/popularEnterprises', (req, res) => {
-    const { userEnterprises, x, y, limit } = req.query;
+// Get Popular Companies
+app.get('/popularCompanies', (req, res) => {
+    const { userCompanies, x, y, limit } = req.query;
 
     let query = {};
 
-    if (userEnterprises && userEnterprises.length > 0) {
-        query._id = { $nin: userEnterprises };
+    if (userCompanies && userCompanies.length > 0) {
+        query._id = { $nin: userCompanies };
     }
 
     // Query the database for the 10 most popular documents based on popularity
-    Enterprise.find(query)
+    Company.find(query)
         .select('_id info reviews statistics communities')
         .sort({ 'statistics.popularity': -1 })
         .limit(parseInt(limit))
@@ -353,19 +360,19 @@ app.get('/popularEnterprises', (req, res) => {
         });
 });
 
-// Get Nearest Enterprises
-app.get('/nearbyEnterprises', async (req, res) => {
-    const { userEnterprises, x, y, limit } = req.query;
+// Get Nearest Companies
+app.get('/nearbyCompanies', async (req, res) => {
+    const { userCompanies, x, y, limit } = req.query;
 
     let query = {};
 
-    if (userEnterprises && userEnterprises.length > 0) {
-        query._id = { $nin: userEnterprises };
+    if (userCompanies && userCompanies.length > 0) {
+        query._id = { $nin: userCompanies };
     }
 
     try {
         // Find all documents
-        const allDocs = await Enterprise.find(query)
+        const allDocs = await Company.find(query)
             .select('_id info reviews statistics communities');
 
         // Calculate distances
@@ -394,11 +401,11 @@ app.get('/nearbyEnterprises', async (req, res) => {
     }
 });
 
-// Delete Enterprise
-app.delete('/deleteEnterprise/:id', async (req, res) => {
+// Delete Company
+app.delete('/deleteCompany/:id', async (req, res) => {
     try {
-        await Enterprise.deleteOne({ _id: req.params.id });
-        res.status(200).json({ message: 'Enterprise Deleted' })
+        await Company.deleteOne({ _id: req.params.id });
+        res.status(200).json({ message: 'Company Deleted' })
     } catch (err) {
         res.status(500).json({ message: 'Error on Server Side' });
     }
@@ -524,18 +531,18 @@ app.get('/fetchWorkshops', async (req, res) => {
 // Search Functionality
 app.get('/search', async (req, res) => {
     try {
-        const { query, enterpriseLimit, productLimit, userLimit } = req.query;
+        const { query, CompanyLimit, productLimit, userLimit } = req.query;
 
-        // Perform the search query for enterprises
-        const enterprises = await Enterprise.find({
+        // Perform the search query for Companies
+        const Companies = await Company.find({
             $or: [
                 { 'info.name': { $regex: query, $options: 'i' } },
                 { 'info.category': { $regex: query, $options: 'i' } },
             ],
-        }).select('_id info reviews statistics communities').limit(Number(enterpriseLimit));
+        }).select('_id info reviews statistics communities').limit(Number(CompanyLimit));
 
         // Perform the search query for products using aggregation
-        const products = await Enterprise.aggregate([
+        const products = await Company.aggregate([
             { $unwind: '$product_categories' },
             { $unwind: '$product_categories.subCategories' },
             { $unwind: '$product_categories.subCategories.products' },
@@ -566,7 +573,7 @@ app.get('/search', async (req, res) => {
             productResponse = products[0].products.slice(0, Number(productLimit));
         }
 
-        res.status(200).json({ enterprises: enterprises, products: productResponse, users: users });
+        res.status(200).json({ Companies: Companies, products: productResponse, users: users });
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }

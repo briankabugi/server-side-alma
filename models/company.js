@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const EnterpriseSchema = new mongoose.Schema({
+const CompanySchema = new mongoose.Schema({
     info: {
         type: {},
         required: true
@@ -36,8 +36,20 @@ const EnterpriseSchema = new mongoose.Schema({
     communities: {
         type: [],
         default: []
+    },
+    friends: {
+        type: [],
+        default: []
+    },
+    events: {
+        type: [],
+        default: []
+    },
+    code: {
+        type: String,
+        required: true
     }
 })
 
-const Enterprise = mongoose.model('Enterprise', EnterpriseSchema)
-module.exports = Enterprise
+const Company = mongoose.model('Company', CompanySchema)
+module.exports = Company

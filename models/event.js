@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const WorkshopSchema = new mongoose.Schema({
+const EventSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -21,9 +21,11 @@ const WorkshopSchema = new mongoose.Schema({
         type: {},
         required: true
     },
-    attending: Number,
-    type: String
+    attending: {
+        type: [],
+        default: []
+    }
 })
 
-const Workshop = mongoose.model('Workshop', WorkshopSchema)
-module.exports = Workshop
+const Event = mongoose.model('Event', EventSchema)
+module.exports = Event
