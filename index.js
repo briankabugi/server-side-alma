@@ -80,16 +80,16 @@ app.post('/login', async (req, res) => {
             const verified = bcrypt.compare(code, user.code)
             if (verified) {
                 const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-                res.status(200).json({ id: 1, userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences, friends: user.friends })
+                res.status(200).json({ userID: user._id, token: token, info: user.info, messages: user.messages, preferences: user.preferences, friends: user.friends })
             } else {
-                res.status(500).json({ id: 2, message: `Invalid Password for ${user.info.name}` })
+                res.status(500).json({ message: 'Check password and try again' })
             }
         } else {
-            res.status(500).json({ id: 3, message: 'User Not Found' })
+            res.status(500).json({ message: 'User Not Found' })
         }
     } catch (error) {
         // Handle any database errors
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Internal Server error' });
     }
 });
 
