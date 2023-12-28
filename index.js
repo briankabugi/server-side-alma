@@ -3,6 +3,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+const { Binary } = require("mongodb")
 const passport = require('passport')
 const bcrypt = require('bcrypt');
 const http = require('http')
@@ -197,19 +198,24 @@ app.delete('/deleteUser/:id', async (req, res) => {
 
 // Launch Company
 app.post('/createCompany', async (req, res) => {
-    //Extract Parameters
-    const newCompany = req.body
+    try {
+        // Extract Parameters
+        const newCompany = req.body;
 
-    // Create New user Object
-    const createdCompany = await new Company(newCompany)
+        newCompany.code = await bcrypt.hash(newCompany.code, 10);
+        newCompany.info.logo = new Binary(Buffer.from(newCompany.info.logo, 'base64'));
 
-    //Save to database
-    createdCompany.save().then(() => {
-        res.status(200).json({ message: 'Launch Successful' })
-    }).catch((error) => {
-        console.log('Could not create Company', error)
-        res.status(500).json({ message: 'Could not create Company' })
-    })
+        // Create New Company Object
+        const createdCompany = new Company(newCompany);
+
+        // Save to database
+        await createdCompany.save();
+
+        res.status(200).json({ message: 'Launch Successful' });
+    } catch (error) {
+        console.log('Could not create Company', error);
+        res.status(500).json({ message: 'Could not create Company' });
+    }
 })
 
 // Find Company
