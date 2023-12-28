@@ -214,7 +214,7 @@ app.post('/createCompany', async (req, res) => {
         res.status(200).json({ message: 'Launch Successful' });
     } catch (error) {
         console.log('Could not create Company', error);
-        res.status(500).json({ message: 'Could not create Company' });
+        res.status(500).json({ message: error.message });
     }
 })
 
@@ -226,7 +226,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
 
         // Find the Companies created by that user ID
         const Companies = await Company.find({ 'info.created_by': userId })
-            .select('info ');
+            .select('info product_categories reviews statistics communities events');
 
         // Send the response as JSON
         res.status(200).json(Companies);
