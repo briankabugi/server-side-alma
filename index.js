@@ -671,7 +671,6 @@ app.post('/addMessage', async (req, res) => {
     const { sender, receiver, content, createdAt } = req.body;
 
     const newMessage = new Message({
-        type,
         sender,
         receiver,
         content,
