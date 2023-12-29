@@ -304,11 +304,10 @@ app.get('/locateCompany/:id', async (req, res) => {
     try {
         // Find the Company with that id
         const company = await Company.findById(req.params.id)
-            .select('info');
 
         if (company) {
             // Send the response as JSON
-            res.status(200).json({info: company});
+            res.status(200).json({info: company.info});
         } else {
             // Send the response as JSON
             res.status(404).json({ message: 'Company not found' });
