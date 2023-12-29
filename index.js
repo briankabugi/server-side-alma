@@ -674,7 +674,8 @@ app.post('/addMessage', async (req, res) => {
         sender,
         receiver,
         content,
-        createdAt
+        createdAt,
+        new: true,
     });
 
     try {
@@ -690,8 +691,7 @@ app.put('/openMessage/:id', async (req, res) => {
     try {
         const message = await Message.findByIdAndUpdate(
             req.params.id,
-            { $unset: { new: ''} },
-            { new: true }
+            { $unset: { new: ''} }
         );
 
         if (!message) {
