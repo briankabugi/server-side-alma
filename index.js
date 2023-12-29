@@ -220,9 +220,8 @@ app.put('/updateUserPreferences/:id', async (req, res) => {
     }
 })
 
-
 // Updating Friends List
-app.put('/addFriend', async (req, res) => {
+app.put('/addFriends', async (req, res) => {
     const id1 = req.body.id1;
     const id2 = req.body.id2;
     const state1 = req.body.state1
