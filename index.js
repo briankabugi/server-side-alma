@@ -303,15 +303,15 @@ app.get('/findCompanies/:userId', async (req, res) => {
 app.get('/locateCompany/:id', async (req, res) => {
     try {
         // Find the Company with that id
-        const Company = await Company.findById(req.params.id)
+        const company = await Company.findById(req.params.id)
             .select('info');
 
-        if (Company) {
+        if (company) {
             // Send the response as JSON
-            res.status(200).json({info: Company});
+            res.status(200).json({info: company});
         } else {
             // Send the response as JSON
-            res.status(500).json({ message: 'Company not found' });
+            res.status(404).json({ message: 'Company not found' });
         }
 
     } catch (err) {
