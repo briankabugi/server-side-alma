@@ -17,9 +17,9 @@ const MessageSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    opened: {
+    new: {
         type: Boolean,
-        required: true
+        required: false
     }
 })
 
