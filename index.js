@@ -140,7 +140,6 @@ app.get('/nearbyUsers', async (req, res) => {
     }
 });
 
-
 // Find User
 app.get('/findUser/:id', async (req, res) => {
     try {
