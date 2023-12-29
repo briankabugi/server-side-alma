@@ -222,22 +222,24 @@ app.put('/updateUserPreferences/:id', async (req, res) => {
 
 
 // Updating Friends List
-app.put('/updateFriends', async (req, res) => {
+app.put('/addFriend', async (req, res) => {
     const id1 = req.body.id1;
     const id2 = req.body.id2;
+    const state1 = req.body.state1
+    const state2 = req.body.state2
 
     try {
-        // Fetch the users
-        const user1 = await User.findById(id1);
-        const user2 = await User.findById(id2);
+        // Fetching entities
+        const entity1 = state1 ? await User.findById(id1): await Company.findById(id1);
+        const entity2 = state2 ? await User.findById(id2): await Company.findById(id2);
 
-        if (!user1 || !user2) {
-            return res.status(404).send({ message: 'User not found' });
+        if (!entity1 || !entity2) {
+            return res.status(404).send({ message: 'User / Company not found' });
         }
 
         // Update friends field
-        user1.friends.push(id2);
-        user2.friends.push(id1);
+        entity1.friends.push(id2);
+        entity2.friends.push(id1);
 
         // Save the updated users
         await user1.save();
