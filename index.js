@@ -142,24 +142,31 @@ app.get('/nearbyUsers', async (req, res) => {
 
 
 // Find User
-app.get('/findUser/:userId', async (req, res) => {
+app.get('/findUser/:id', async (req, res) => {
     try {
         // Get the user ID from the params
-        const userId = req.params.userId;
+        const id = req.params.id;
 
         // Find the User
-        const user = await User.findOne({ _id: userId });
+        const user = await User.findOne({ _id: id });
 
         // Send the response as JSON
-        res.status(200).json({ info: user.info });
+        if (user) {
+            // Send the response as JSON
+            res.status(200).json({info: user.info});
+        } else {
+            // Send the response as JSON
+            res.status(500).json({ message: 'User not found' });
+        }
+
     } catch (err) {
         // Handle any errors
         res.status(500).send(err.message);
     }
 });
 
-// Update User
-app.put('/updateUser/:id', async (req, res) => {
+// Update User Info
+app.put('/updateUserInfo/:id', async (req, res) => {
     const updatedInfo = req.body; // The updated Company data
 
     try {
@@ -185,6 +192,35 @@ app.put('/updateUser/:id', async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 })
+
+// Update User
+app.put('/updateUserPreferences/:id', async (req, res) => {
+    const updatedPreferences = req.body; // The updated Company data
+
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        } else {
+            try {
+                user.preferences = updatedPreferences;
+
+                // Save the updated User
+                await user.save();
+
+                res.status(200).json({ message: 'Saved' })
+            } catch (error) {
+                res.status(500).json({ error: error.message })
+            }
+
+        }
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+})
+
 
 // Updating Friends List
 app.put('/updateFriends', async (req, res) => {
@@ -254,7 +290,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
 
         // Find the Companies created by that user ID
         const Companies = await Company.find({ 'info.created_by': userId })
-            .select('_id info product_categories reviews statistics communities events');
+            .select('_id info friends product_categories reviews statistics communities events');
 
         // Send the response as JSON
         res.status(200).json(Companies);
@@ -269,14 +305,14 @@ app.get('/locateCompany/:id', async (req, res) => {
     try {
         // Find the Company with that id
         const Company = await Company.findById(req.params.id)
-            .select('info product_categories reviews statistics communities');
+            .select('info');
 
         if (Company) {
             // Send the response as JSON
-            res.status(200).json(Company);
+            res.status(200).json({info: Company});
         } else {
             // Send the response as JSON
-            res.status(500).json({ error: 'Company not found' });
+            res.status(500).json({ message: 'Company not found' });
         }
 
     } catch (err) {
@@ -617,16 +653,11 @@ app.get('/search', async (req, res) => {
 // Fetch User Messages
 app.get('/fetchMessages', async (req, res) => {
     try {
-        const { userID } = req.query;
-
-        const user = await User.findById(userID);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        const { id } = req.query;
 
         // Fetch all messages sent or received by the user
         const messages = await Message.find({
-            $or: [{ sender: userID }, { receiver: userID }]
+            $or: [{ sender: id }, { receiver: id }]
         });
 
         res.status(200).json({ messages: messages });
@@ -641,6 +672,7 @@ app.post('/addMessage', async (req, res) => {
     const { sender, receiver, content, createdAt } = req.body;
 
     const newMessage = new Message({
+        type,
         sender,
         receiver,
         content,
