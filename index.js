@@ -152,7 +152,7 @@ app.get('/findUser/:id', async (req, res) => {
         // Send the response as JSON
         if (user) {
             // Send the response as JSON
-            res.status(200).json({info: user.info});
+            res.status(200).json({ info: user.info });
         } else {
             // Send the response as JSON
             res.status(500).json({ message: 'User not found' });
@@ -229,8 +229,8 @@ app.put('/addFriends', async (req, res) => {
 
     try {
         // Fetching entities
-        const entity1 = state1 ? await User.findById(id1): await Company.findById(id1);
-        const entity2 = state2 ? await User.findById(id2): await Company.findById(id2);
+        const entity1 = state1 ? await User.findById(id1) : await Company.findById(id1);
+        const entity2 = state2 ? await User.findById(id2) : await Company.findById(id2);
 
         if (!entity1 || !entity2) {
             return res.status(404).send({ message: 'User / Company not found' });
@@ -308,7 +308,7 @@ app.get('/locateCompany/:id', async (req, res) => {
 
         if (company) {
             // Send the response as JSON
-            res.status(200).json({info: company.info});
+            res.status(200).json({ info: company.info });
         } else {
             // Send the response as JSON
             res.status(404).json({ message: 'Company not found' });
@@ -694,10 +694,10 @@ app.put('/openMessage/:id', async (req, res) => {
         );
 
         if (!message) {
-            return res.status(404).send({ message: 'Message not found' });
+            res.status(404).send({ message: 'Message not found' });
         }
 
-        res.status(200).send({message: 'Success'})
+        res.status(200).send({ message: 'Success' })
     } catch (error) {
         res.status(500).send({ message: 'Something went wrong' });
     }
