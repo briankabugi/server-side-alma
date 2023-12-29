@@ -686,4 +686,22 @@ app.post('/addMessage', async (req, res) => {
     }
 });
 
+app.put('/openMessage/:id', async (req, res) => {
+    try {
+        const message = await Message.findByIdAndUpdate(
+            req.params.id,
+            { $unset: { isNew: 1 } },
+            { new: true }
+        );
+
+        if (!message) {
+            return res.status(404).send({ message: 'Message not found' });
+        }
+
+        res.status(200)
+    } catch (error) {
+        res.status(500).send({ message: 'Something went wrong' });
+    }
+});
+
 
