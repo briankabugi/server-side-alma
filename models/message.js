@@ -19,7 +19,7 @@ const MessageSchema = new mongoose.Schema({
     },
     new: {
         type: Boolean,
-        required: false
+        required: true
     }
 })
 
