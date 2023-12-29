@@ -186,6 +186,34 @@ app.put('/updateUser/:id', async (req, res) => {
     }
 })
 
+// Updating Friends List
+app.put('/updateFriends', async (req, res) => {
+    const id1 = req.body.id1;
+    const id2 = req.body.id2;
+
+    try {
+        // Fetch the users
+        const user1 = await User.findById(id1);
+        const user2 = await User.findById(id2);
+
+        if (!user1 || !user2) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        // Update friends field
+        user1.friends.push(id2);
+        user2.friends.push(id1);
+
+        // Save the updated users
+        await user1.save();
+        await user2.save();
+
+        res.send({ message: 'Friends updated successfully' });
+    } catch (error) {
+        res.status(500).send({ message: 'Server error' });
+    }
+});
+
 // Delete User 
 app.delete('/deleteUser/:id', async (req, res) => {
     try {
@@ -216,7 +244,7 @@ app.post('/createCompany', async (req, res) => {
         console.log('Could not create Company', error);
         res.status(500).json({ message: error.message });
     }
-})
+});
 
 // Find Company
 app.get('/findCompanies/:userId', async (req, res) => {
@@ -226,7 +254,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
 
         // Find the Companies created by that user ID
         const Companies = await Company.find({ 'info.created_by': userId })
-            .select('info product_categories reviews statistics communities events');
+            .select('_id info product_categories reviews statistics communities events');
 
         // Send the response as JSON
         res.status(200).json(Companies);
