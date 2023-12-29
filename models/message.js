@@ -16,6 +16,10 @@ const MessageSchema = new mongoose.Schema({
     createdAt: {
         type: Number,
         required: true
+    },
+    opened: {
+        type: Boolean,
+        required: true
     }
 })
 
