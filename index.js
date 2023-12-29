@@ -242,12 +242,12 @@ app.put('/addFriend', async (req, res) => {
         entity2.friends.push(id1);
 
         // Save the updated users
-        await user1.save();
-        await user2.save();
+        await entity1.save();
+        await entity2.save();
 
-        res.send({ message: 'Friends updated successfully' });
+        res.send({ message: 'Success' });
     } catch (error) {
-        res.status(500).send({ message: 'Server error' });
+        res.status(500).send({ message: error.message });
     }
 });
 
