@@ -690,16 +690,17 @@ app.put('/openMessage/:id', async (req, res) => {
     try {
         const message = await Message.findByIdAndUpdate(
             req.params.id,
-            { $unset: { new: 1 } }
+            { $unset: { new: 1 } },
+            { new: true }
         );
 
         if (!message) {
             res.status(404).send({ message: 'Message not found' });
         }
 
-        res.status(200).send({ message: 'Success' })
+        res.status(200).send({ message: message })
     } catch (error) {
-        res.status(500).send({ message: 'Something went wrong' });
+        res.status(500).send({ message: error.message });
     }
 });
 
