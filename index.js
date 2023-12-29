@@ -690,8 +690,7 @@ app.put('/openMessage/:id', async (req, res) => {
     try {
         const message = await Message.findByIdAndUpdate(
             req.params.id,
-            { $unset: { isNew: 1 } },
-            { new: true }
+            { $unset: { isNew: 1 } }
         );
 
         if (!message) {
