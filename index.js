@@ -220,7 +220,7 @@ app.put('/updateUserPreferences/:id', async (req, res) => {
     }
 })
 
-// Updating Friends List
+// Adding Friends
 app.put('/addFriends', async (req, res) => {
     const id1 = req.body.id1;
     const id2 = req.body.id2;
@@ -239,6 +239,42 @@ app.put('/addFriends', async (req, res) => {
         // Update friends field
         entity1.friends.push(id2);
         entity2.friends.push(id1);
+
+        // Save the updated users
+        await entity1.save();
+        await entity2.save();
+
+        res.send({ message: 'Success' });
+    } catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+});
+
+// Removing Friends
+app.put('/removeFriends', async (req, res) => {
+    const id1 = req.body.id1;
+    const id2 = req.body.id2;
+    const state1 = req.body.state1
+    const state2 = req.body.state2
+
+    try {
+        // Fetching entities
+        const entity1 = state1 ? await User.findById(id1) : await Company.findById(id1);
+        const entity2 = state2 ? await User.findById(id2) : await Company.findById(id2);
+
+        if (!entity1 || !entity2) {
+            return res.status(404).send({ message: 'User / Company not found' });
+        }
+
+        // Update friends field
+        const index1 = entity1.friends.indexOf(id2);
+        const index2 = entity2.friends.indexOf(id1);
+        if (index1 !== -1) {
+            entity1.friends.splice(index1, 1);
+        }
+        if (index2 !== -1) {
+            entity2.friends.splice(index2, 1);
+        }
 
         // Save the updated users
         await entity1.save();
