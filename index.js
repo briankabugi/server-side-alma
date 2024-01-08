@@ -329,7 +329,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
             .select('_id info friends product_categories reviews statistics communities events');
 
         // Send the response as JSON
-        res.status(200).json(Companies);
+        res.status(200).json({companies: Companies});
     } catch (error) {
         // Handle any errors
         res.status(500).json({ message: error.message });
