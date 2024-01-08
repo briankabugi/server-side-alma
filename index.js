@@ -193,26 +193,24 @@ app.put('/updateUserInfo/:id', async (req, res) => {
 })
 
 // Update User
-app.put('/updateUserPreferences/:id', async (req, res) => {
-    const updatedPreferences = req.body; // The updated Company data
-
+app.put('/updatePreferences', async (req, res) => {
+    const { id, state, preferences} = req.query; 
     try {
-        const user = await User.findById(req.params.id);
+        const entity = state ? await User.findById(id) : Company.findById(id)
 
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!entity) {
+            return res.status(404).json({ message: 'User / Company not found' });
         } else {
             try {
-                user.preferences = updatedPreferences;
+                entity.preferences = preferences;
 
                 // Save the updated User
-                await user.save();
+                await entity.save();
 
                 res.status(200).json({ message: 'Saved' })
             } catch (error) {
                 res.status(500).json({ error: error.message })
             }
-
         }
 
     } catch (error) {
