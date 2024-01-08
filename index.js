@@ -326,7 +326,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
 
         // Find the Companies created by that user ID
         const Companies = await Company.find({ 'info.created_by': userId })
-            .select('_id info friends product_categories reviews statistics communities events');
+            .select('_id info friends preferences product_categories reviews statistics communities events');
 
         // Send the response as JSON
         res.status(200).json({companies: Companies});
