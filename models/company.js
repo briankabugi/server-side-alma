@@ -29,6 +29,10 @@ const CompanySchema = new mongoose.Schema({
         type: [],
         default: []
     },
+    preferences: {
+        type: [],
+        default: []
+    },
     statistics: {
         type : {},
         default: {}
