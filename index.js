@@ -194,7 +194,7 @@ app.put('/updateUserInfo/:id', async (req, res) => {
 
 // Update User
 app.put('/updatePreferences', async (req, res) => {
-    const { id, state, preferences} = req.query; 
+    const { id, state, preferences } = req.query;
     try {
         const entity = state ? await User.findById(id) : Company.findById(id)
 
@@ -327,7 +327,7 @@ app.get('/findCompanies/:userId', async (req, res) => {
             .select('_id info friends preferences product_categories reviews statistics communities events');
 
         // Send the response as JSON
-        res.status(200).json({companies: Companies});
+        res.status(200).json({ companies: Companies });
     } catch (error) {
         // Handle any errors
         res.status(500).json({ message: error.message });
@@ -725,7 +725,7 @@ app.put('/openMessage/:id', async (req, res) => {
     try {
         const message = await Message.findByIdAndUpdate(
             req.params.id,
-            { $unset: { new: ''} }
+            { $unset: { new: '' } }
         );
 
         if (!message) {
@@ -736,6 +736,36 @@ app.put('/openMessage/:id', async (req, res) => {
     } catch (error) {
         res.status(500).send({ message: error.message });
     }
+});
+
+app.post('/unreadMessages', async (req, res) => {
+    try {
+        const ids = req.body.ids;
+        let result = {};
+
+        for (let id of ids) {
+            let messages = await Message.find({
+                new: true,
+                $or: [{ sender: id }, { receiver: id }]
+            });
+
+            let chats = new Set();
+            messages.forEach(message => {
+                chats.add(message.sender);
+                chats.add(message.receiver);
+            });
+
+            result[id] = {
+                totalMessages: messages.length,
+                totalChats: chats.size
+            };
+        }
+
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' })
+    }
+
 });
 
 
