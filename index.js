@@ -741,7 +741,7 @@ app.put('/openMessage/:id', async (req, res) => {
 app.post('/unreadMessages', async (req, res) => {
     try {
         const ids = req.body.ids;
-        let result = {};
+        let result = [];
 
         for (let id of ids) {
             let messages = await Message.find({
@@ -755,17 +755,19 @@ app.post('/unreadMessages', async (req, res) => {
                 chats.add(message.receiver);
             });
 
-            result[id] = {
-                totalMessages: messages.length,
-                totalChats: chats.size
-            };
+            if (chats.size > 0) {
+                result.push({
+                    id: id,
+                    totalMessages: messages.length,
+                    totalChats: chats.size
+                });
+            }
         }
 
-        res.json(result);
+        res.status(200).json({result: result});
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' })
     }
-
 });
 
 
