@@ -746,21 +746,20 @@ app.post('/unreadMessages', async (req, res) => {
         for (let id of ids) {
             let messages = await Message.find({
                 new: true,
-                $or: [{ sender: id }, { receiver: id }]
+                receiver: id
             });
 
             let chats = new Set();
             messages.forEach(message => {
                 chats.add(message.sender);
-                chats.add(message.receiver);
             });
 
             if (chats.size > 0) {
                 result.push({
                     id: id,
-                    totalMessages: messages.length,
-                    totalChats: chats.size
-                });
+                    chats: chats.size,
+                    messages: messages.length
+                })
             }
         }
 
