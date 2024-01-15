@@ -37,8 +37,9 @@ mongoose.connect(
 const User = require('./models/user')
 const Company = require('./models/company')
 const Community = require('./models/community')
-const Workshop = require('./models/event')
+const Event = require('./models/event')
 const Message = require('./models/message')
+const Order = require('./models/order')
 
 // Set Up Servers
 const app_server = http.createServer(app)
@@ -581,18 +582,18 @@ app.get('/fetchCommunities', async (req, res) => {
     }
 });
 
-// Create Workshop
-app.post('/createWorkshop', async (req, res) => {
+// Create Event
+app.post('/createEvent', async (req, res) => {
     //Extract Parameters
-    const newWorkshop = req.body
+    const newEvent = req.body
 
     try {
         // Create New user Object
-        const createdWorkshop = await new Workshop(newWorkshop)
+        const createdEvent = await new Event(newEvent)
 
         //Save to database
-        createdWorkshop.save().then(() => {
-            res.status(200).json({ message: 'Workshop Created' })
+        createdEvent.save().then(() => {
+            res.status(200).json({ message: 'Event Created' })
         }).catch((error) => {
             res.status(500).json({ error: error.message })
         })
@@ -601,15 +602,15 @@ app.post('/createWorkshop', async (req, res) => {
     }
 })
 
-// Fetch Workshops
-app.get('/fetchWorkshops', async (req, res) => {
+// Fetch Events
+app.get('/fetchEvents', async (req, res) => {
     const { x, y, limit } = req.query;
     try {
         // Find all documents
-        const Workshops = await Workshop.find();
+        const Events = await Event.find();
 
         // Calculate distances
-        const WorkshopsWithDistances = Workshops.map(doc => {
+        const EventsWithDistances = Events.map(doc => {
             const { latitude, longitude } = doc.location;
             const R = 6371;
             const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
@@ -623,10 +624,10 @@ app.get('/fetchWorkshops', async (req, res) => {
             return { ...doc.toObject(), distance };
         });
 
-        const SortedWorkshops = WorkshopsWithDistances.sort((a, b) => a.distance - b.distance);
-        const nearbyWorkshops = SortedWorkshops.slice(0, limit)
+        const SortedEvents = EventsWithDistances.sort((a, b) => a.distance - b.distance);
+        const nearbyEvents = SortedEvents.slice(0, limit)
 
-        res.status(200).json(nearbyWorkshops)
+        res.status(200).json(nearbyEvents)
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
@@ -768,5 +769,10 @@ app.post('/unreadMessages', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' })
     }
 });
+
+// Fetch Orders
+app.get('/fetchOrders', async (req, res) => {
+    const { ids } = req.query
+}) 
 
 
