@@ -7,7 +7,7 @@ const { Binary } = require("mongodb")
 const passport = require('passport')
 const bcrypt = require('bcrypt');
 const http = require('http')
-const ws = require('ws')
+const pusher = require("pusher");
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -19,6 +19,14 @@ app.use(bodyParser.json({ limit: "10mb" }))
 app.use(passport.initialize())
 
 const jwt = require('jsonwebtoken')
+
+var Pusher = new pusher({
+    appId: "1755322",
+    key: "56d330991bc288f2f16f",
+    secret: "beab0fb1b12cc2fd108b",
+    cluster: "ap2",
+    useTLS: true
+});
 
 // Connect to Database
 mongoose.connect(
@@ -242,6 +250,10 @@ app.put('/addFriends', async (req, res) => {
         // Save the updated users
         await entity1.save();
         await entity2.save();
+
+        Pusher.trigger(id2, "add-friend", {
+            message: entity1.info.name + " Accepted Your Friend Request"
+        });
 
         res.send({ message: 'Success' });
     } catch (error) {
@@ -715,6 +727,11 @@ app.post('/addMessage', async (req, res) => {
 
     try {
         await newMessage.save();
+
+        Pusher.trigger(receiver, "new-message", {
+            message: "Incoming Message"
+        });
+
         res.status(200).json({ message: 'Message Sent' });
     } catch (err) {
         console.error(err);
@@ -764,7 +781,7 @@ app.post('/unreadMessages', async (req, res) => {
             }
         }
 
-        res.status(200).json({result: result});
+        res.status(200).json({ result: result });
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' })
     }
@@ -773,6 +790,6 @@ app.post('/unreadMessages', async (req, res) => {
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {
     const { ids } = req.query
-}) 
+})
 
 
