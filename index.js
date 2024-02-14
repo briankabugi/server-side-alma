@@ -150,21 +150,20 @@ app.get('/nearbyUsers', async (req, res) => {
 });
 
 // Find User
-app.get('/findUser/:id', async (req, res) => {
-    try {
-        // Get the user ID from the params
-        const id = req.params.id;
+app.get('/findEntity', async (req, res) => {
+    const { id, isUser } = req.query
 
-        // Find the User
-        const user = await User.findOne({ _id: id });
+    try {
+        // Find the Entity
+        const entity = isUser ? await User.findOne({ _id: id }) : await Company.findOne({ _id: id })
 
         // Send the response as JSON
-        if (user) {
+        if (entity) {
             // Send the response as JSON
-            res.status(200).json({ info: user.info });
+            res.status(200).json({ info: entity.info });
         } else {
             // Send the response as JSON
-            res.status(500).json({ message: 'User not found' });
+            res.status(500).json({ message: 'Entiity not found' });
         }
 
     } catch (err) {
@@ -344,26 +343,6 @@ app.get('/findCompanies/:userId', async (req, res) => {
     } catch (error) {
         // Handle any errors
         res.status(500).json({ message: error.message });
-    }
-});
-
-// Locate Company
-app.get('/locateCompany/:id', async (req, res) => {
-    try {
-        // Find the Company with that id
-        const company = await Company.findById(req.params.id)
-
-        if (company) {
-            // Send the response as JSON
-            res.status(200).json({ info: company.info });
-        } else {
-            // Send the response as JSON
-            res.status(404).json({ message: 'Company not found' });
-        }
-
-    } catch (err) {
-        // Handle any errors
-        res.status(500).send(err.message);
     }
 });
 
