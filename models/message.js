@@ -2,11 +2,11 @@ const mongoose = require('mongoose')
 
 const MessageSchema = new mongoose.Schema({
     sender: {
-        type: String,
+        type: Object,
         required: true
     },
     receiver: {
-        type: String,
+        type: Object,
         required: true
     },
     content: {
