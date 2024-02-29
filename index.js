@@ -19,14 +19,6 @@ app.use(passport.initialize())
 
 const jwt = require('jsonwebtoken')
 
-var Pusher = new pusher({
-    appId: "1755322",
-    key: "56d330991bc288f2f16f",
-    secret: "beab0fb1b12cc2fd108b",
-    cluster: "ap2",
-    useTLS: true
-});
-
 // Connect to Database
 mongoose.connect(
     process.env.DATABASE_URL,
@@ -248,10 +240,6 @@ app.put('/addFriends', async (req, res) => {
         // Save the updated users
         await entity1.save();
         await entity2.save();
-
-        Pusher.trigger(id2, "add-friend", {
-            message: entity1.info.name + " Accepted Your Friend Request"
-        });
 
         res.send({ message: 'Success' });
     } catch (error) {
