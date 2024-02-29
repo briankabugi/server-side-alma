@@ -7,7 +7,6 @@ const { Binary } = require("mongodb")
 const passport = require('passport')
 const bcrypt = require('bcrypt');
 const http = require('http')
-const pusher = require("pusher");
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -706,11 +705,6 @@ app.post('/addMessage', async (req, res) => {
 
     try {
         await newMessage.save();
-
-        Pusher.trigger(receiver, "new-message", {
-            message: "Incoming Message"
-        });
-
         res.status(200).json({ message: 'Message Sent' });
     } catch (err) {
         console.error(err);
