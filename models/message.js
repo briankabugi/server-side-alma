@@ -20,6 +20,10 @@ const MessageSchema = new mongoose.Schema({
     new: {
         type: Boolean,
         required: true
+    },
+    content_type: {
+        type: String,
+        required: true
     }
 })
 

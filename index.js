@@ -725,7 +725,7 @@ app.post('/unreadMessages', async (req, res) => {
         for (let id of ids) {
             let messages = await Message.find({
                 new: true,
-                receiver: id
+                'receiver.id': id
             });
 
             let chats = new Set();
