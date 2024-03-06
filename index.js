@@ -681,7 +681,7 @@ app.get('/fetchMessages', async (req, res) => {
 
 // Add Message
 app.post('/addMessage', async (req, res) => {
-    const { sender, receiver, content, createdAt } = req.body;
+    const { sender, receiver, content, createdAt, content_type } = req.body;
 
     const newMessage = new Message({
         sender,
@@ -689,6 +689,7 @@ app.post('/addMessage', async (req, res) => {
         content,
         createdAt,
         new: true,
+        content_type
     });
 
     try {
