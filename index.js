@@ -721,29 +721,22 @@ app.put('/openMessage/:id', async (req, res) => {
 app.post('/unreadMessages', async (req, res) => {
     try {
         const ids = req.body.ids;
-        const batchSize = 10;
+        const messages = await Message.find({
+            new: true,
+            'receiver.id': { $in: ids }
+        });
 
-        const result = await Promise.all(ids.map(async (id) => {
-            const messages = await Message.find({
-                new: true,
-                'receiver.id': id
-            }).limit(batchSize); // Limit the number of messages
+        const result = ids.map(id => {
+            const userMessages = messages.filter(msg => msg.receiver.id === id);
+            const chats = new Set(userMessages.map(msg => msg.sender.id));
+            return {
+                id: id,
+                chats: chats.size,
+                messages: userMessages.length
+            };
+        });
 
-            const chats = new Set();
-            messages.forEach((message) => {
-                chats.add(message.sender.id);
-            });
-
-            if (chats.size > 0) {
-                return {
-                    id: id,
-                    chats: chats.size,
-                    messages: messages.length
-                };
-            }
-        }));
-
-        res.status(200).json({ result: result.filter(Boolean) }); // Filter out null/undefined results
+        res.status(200).json({ result: result });
     } catch (error) {
         console.error('Error fetching unread messages:', error);
         res.status(500).json({ message: 'Internal Server Error' });
