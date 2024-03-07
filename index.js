@@ -731,7 +731,7 @@ app.post('/unreadMessages', async (req, res) => {
 
             let chats = new Set();
             messages.forEach(message => {
-                chats.add(message.sender);
+                chats.add(message.sender.id);
             });
 
             if (chats.size > 0) {
