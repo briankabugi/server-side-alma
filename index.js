@@ -729,11 +729,15 @@ app.post('/unreadMessages', async (req, res) => {
         const result = ids.map(id => {
             const userMessages = messages.filter(msg => msg.receiver.id === id);
             const chats = new Set(userMessages.map(msg => msg.sender.id));
-            return {
-                id: id,
-                chats: chats.size,
-                messages: userMessages.length
-            };
+            if (chats.size > 0) {
+                return {
+                    id: id,
+                    chats: chats.size,
+                    messages: userMessages.length
+                };
+            } else {
+                return null
+            }
         });
 
         res.status(200).json({ result: result });
