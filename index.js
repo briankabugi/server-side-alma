@@ -736,7 +736,7 @@ app.post('/unreadMessages', async (req, res) => {
                     messages: userMessages.length
                 };
             } else {
-                return null
+                return {}
             }
         });
 
