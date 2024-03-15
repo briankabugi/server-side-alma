@@ -369,10 +369,9 @@ app.put('/updateCompanyData/:id', async (req, res) => {
     try {
         const company = await Company.findById(id);
 
-        if (company) {
+        if (!company) {
             res.status(404).json({ error: 'Company not found' });
         } else {
-
             company.product_categories = categories
             company.info.images = images
             // Update other properties as needed
