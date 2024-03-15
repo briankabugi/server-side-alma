@@ -394,12 +394,12 @@ app.get('/fetchProducts/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        const Company = await Company.findById(id).select('product_categories');
+        const company = await Company.findById(id).select('product_categories');
 
-        if (!Company) {
+        if (!company) {
             res.status(404).json({ error: 'Company not found' });
         } else {
-            const productCategories = Company.product_categories
+            const productCategories = company.product_categories
             res.status(200).json({ categories: productCategories })
         }
     } catch (error) {
