@@ -367,18 +367,18 @@ app.put('/updateCompanyData/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        const Company = await Company.findById(id);
+        const company = await Company.findById(id);
 
-        if (!Company) {
+        if (company) {
             res.status(404).json({ error: 'Company not found' });
         } else {
 
-            Company.product_categories = categories
-            Company.info.images = images
+            company.product_categories = categories
+            company.info.images = images
             // Update other properties as needed
 
             // Save the updated Company
-            await Company.save().then(() => {
+            await company.save().then(() => {
                 res.status(200).json({ message: 'Changes Saved' });
             }).catch((error) => {
                 res.status(500).json({ message: `Failed to save data on server: ${error.message}` })
