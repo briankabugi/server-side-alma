@@ -617,7 +617,7 @@ app.get('/search', async (req, res) => {
         const { query, CompanyLimit, productLimit, userLimit } = req.query;
 
         // Perform the search query for Companies
-        const Companies = await Company.find({
+        const companies = await Company.find({
             $or: [
                 { 'info.name': { $regex: query, $options: 'i' } },
                 { 'info.category': { $regex: query, $options: 'i' } },
@@ -656,7 +656,7 @@ app.get('/search', async (req, res) => {
             productResponse = products[0].products.slice(0, Number(productLimit));
         }
 
-        res.status(200).json({ Companies: Companies, products: productResponse, users: users });
+        res.status(200).json({ companies: companies, products: productResponse, users: users });
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
