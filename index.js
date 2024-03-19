@@ -322,11 +322,11 @@ app.get('/findCompanies/:userId', async (req, res) => {
         const userId = req.params.userId;
 
         // Find the Companies created by that user ID
-        const Companies = await Company.find({ 'info.created_by': userId })
+        const companies = await Company.find({ 'info.created_by': userId })
             .select('_id info friends preferences product_categories reviews statistics communities events');
 
         // Send the response as JSON
-        res.status(200).json({ companies: Companies });
+        res.status(200).json({ companies: companies });
     } catch (error) {
         // Handle any errors
         res.status(500).json({ message: error.message });
@@ -338,18 +338,18 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
     const info = req.body; // The updated Company data
 
     try {
-        const Company = await Company.findById(req.params.id);
+        const company = await Company.findById(req.params.id);
 
-        if (!Company) {
+        if (!company) {
             // Return 404 error
             return res.status(404).json({ error: 'Company not found' });
         } else {
             // Update the Company with the new data
-            Company.info = info
+            company.info = info
         }
 
         // Save the updated Company
-        await Company.save().then(() => {
+        await company.save().then(() => {
             res.json({ message: 'Saved' });
         }).catch((error) => {
             res.status(500).json({ message: error.message })
