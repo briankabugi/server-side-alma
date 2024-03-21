@@ -17,13 +17,17 @@ const EventSchema = new mongoose.Schema({
         type: {},
         required: true
     },
-    organized_by: {
+    organizer: {
         type: {},
         required: true
     },
     attending: {
         type: [],
         default: []
+    },
+    public: {
+        type: Boolean,
+        required: true
     }
 })
 

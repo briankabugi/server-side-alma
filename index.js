@@ -494,7 +494,6 @@ app.delete('/deleteCompany/:id', async (req, res) => {
     }
 });
 
-
 // Create Community
 app.post('/createCommunity', async (req, res) => {
     //Extract Parameters
@@ -513,7 +512,7 @@ app.post('/createCommunity', async (req, res) => {
     } catch (error) {
         response.status(500).json({ message: error.message })
     }
-})
+});
 
 // Fetch Communities
 app.get('/fetchCommunities', async (req, res) => {
