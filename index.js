@@ -573,9 +573,11 @@ app.post('/createEvent', async (req, res) => {
             res.status(200).json({ message: 'Event Created' })
         }).catch((error) => {
             res.status(500).json({ message: error.message })
+            console.error(error.message)
         })
     } catch (error) {
         response.status(500).json({ message: error.message })
+        console.error(error.message)
     }
 })
 
