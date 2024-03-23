@@ -24,6 +24,14 @@ const CommunitySchema = new mongoose.Schema({
     managed_by: {
         type: String,
         required: true
+    },
+    images: {
+        type: [],
+        default: []
+    },
+    videos: {
+        type: [],
+        default: []
     }
 })
 
