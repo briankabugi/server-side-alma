@@ -772,7 +772,15 @@ app.post('/createOrder', async (req, res) => {
 
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {
-    const { ids } = req.query
-})
+    const { ids } = req.query;
+  
+    try {
+      const orders = await Order.find({ enterprise_id: { $in: ids } });
+      res.json(orders);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server Error' });
+    }
+  });
 
 
