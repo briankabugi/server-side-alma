@@ -748,6 +748,28 @@ app.post('/unreadMessages', async (req, res) => {
     }
 });
 
+// Create Order
+app.post('/createOrder', async (req, res) => {
+    //Extract Parameters
+    const newOrder = req.body
+
+    try {
+        // Create New user Object
+        const createdOrder = await new Order(newOrder)
+
+        //Save to database
+        createdOrder.save().then(() => {
+            res.status(200).json({ message: 'Order Created' })
+        }).catch((error) => {
+            res.status(500).json({ message: error.message })
+            console.error(error.message)
+        })
+    } catch (error) {
+        response.status(500).json({ message: error.message })
+        console.error(error.message)
+    }
+})
+
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {
     const { ids } = req.query
