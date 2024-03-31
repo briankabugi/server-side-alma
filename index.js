@@ -772,7 +772,7 @@ app.post('/createOrder', async (req, res) => {
 
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {
-    const { ids } = req.query;
+    const ids = req.query.ids; // Retrieve the ids from query parameters
 
     try {
         const orders = await Order.find({
@@ -782,7 +782,7 @@ app.get('/fetchOrders', async (req, res) => {
             ]
         });
 
-        res.json(orders)
+        res.json(orders);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server Error' });
