@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 
 const OrderSchema = new mongoose.Schema({
-    enterprise_id: {
-        type: String,
+    buyer: {
+        type: {},
         required: true
-    },
+    }, 
     date: {
         type: Date,
         required: true
@@ -13,13 +13,9 @@ const OrderSchema = new mongoose.Schema({
         type: Object,
         required: true
     },
-    buyer: {
-        type: {},
-        required: true
-    },
     status: {
         type: String,
-        required: true
+        default: 'pending'
     }
 })
 
