@@ -775,12 +775,12 @@ app.get('/fetchOrders', async (req, res) => {
     const ids = req.query.ids; // Retrieve the ids from query parameters
 
     try {
-        const orders = await Order.find({
-            $or: [
-                { buyer: { $in: ids } },
-                ids.map(id => ({ [`products.${id}`]: { $exists: true } }))
-            ]
-        });
+        const conditions = [
+            { buyer: { $in: ids } },
+            ...ids.map(id => ({ [`products.${id}`]: { $exists: true } }))
+        ];
+
+        const orders = await Order.find({ $or: conditions });
 
         res.json(orders);
     } catch (error) {
