@@ -520,8 +520,8 @@ app.get('/fetchCommunities', async (req, res) => {
 
     try {
         // Find all documents
-        const AreaDocs = await Community.find({ 'details.global': false, 'managed_by': { $nin: filter } });
-        const GlobalDocs = await Community.find({ 'details.global': true, 'managed_by': { $nin: filter }});
+        const AreaDocs = await Community.find({ 'managed_by': { $nin: filter },'details.global': false });
+        const GlobalDocs = await Community.find({'managed_by': { $nin: filter }, 'details.global': true });
 
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
