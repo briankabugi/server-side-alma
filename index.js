@@ -146,7 +146,7 @@ app.get('/findEntity', async (req, res) => {
 
     try {
         // Find the Entity
-        const entity = isUser ? await User.findOne({ _id: id }) : await Company.findOne({ _id: id })
+        const entity = isUser ? await User.findById(id) : await Company.findById(id)
 
         // Send the response as JSON
         if (entity) {
