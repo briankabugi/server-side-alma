@@ -9,7 +9,7 @@ const OrderSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    products: {
+    enterprises: {
         type: Object,
         required: true
     },
