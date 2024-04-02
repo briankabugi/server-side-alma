@@ -163,7 +163,7 @@ app.get('/findEntity', async (req, res) => {
                 for (const category of entity.product_categories) {
                     for (const subCategory of category.subCategories) {
                         for (const product of subCategory.products) {
-                            if (productIDs.includes(product._id)) {
+                            if (productIDs.includes(product.id)) {
                                 filteredProducts.push(product);
                             }
                         }
