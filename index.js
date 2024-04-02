@@ -409,12 +409,12 @@ app.get('/fetchProducts/:id', async (req, res) => {
 
 // Get Popular Companies
 app.get('/popularCompanies', (req, res) => {
-    const { userCompanies, x, y, limit } = req.query;
+    const { filter, x, y, limit } = req.query;
 
     let query = {};
 
-    if (userCompanies && userCompanies.length > 0) {
-        query._id = { $nin: userCompanies };
+    if (filter && filter.length > 0) {
+        query._id = { $nin: filter };
     }
 
     // Query the database for the 10 most popular documents based on popularity
@@ -445,12 +445,12 @@ app.get('/popularCompanies', (req, res) => {
 
 // Get Nearest Companies
 app.get('/nearbyCompanies', async (req, res) => {
-    const { userCompanies, x, y, limit } = req.query;
+    const { filter, x, y, limit } = req.query;
 
     let query = {};
 
-    if (userCompanies && userCompanies.length > 0) {
-        query._id = { $nin: userCompanies };
+    if (filter && filter.length > 0) {
+        query._id = { $nin: filter };
     }
 
     try {
@@ -516,12 +516,12 @@ app.post('/createCommunity', async (req, res) => {
 
 // Fetch Communities
 app.get('/fetchCommunities', async (req, res) => {
-    const { x, y, limit } = req.query;
+    const { x, y, limit, filter } = req.query;
 
     try {
         // Find all documents
-        const AreaDocs = await Community.find({ 'details.global': false });
-        const GlobalDocs = await Community.find({ 'details.global': true });
+        const AreaDocs = await Community.find({ 'details.global': false, 'managed_by': { $nin: filter } });
+        const GlobalDocs = await Community.find({ 'details.global': true, 'managed_by': { $nin: filter }});
 
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
@@ -583,10 +583,10 @@ app.post('/createEvent', async (req, res) => {
 
 // Fetch Events
 app.get('/fetchEvents', async (req, res) => {
-    const { x, y, limit } = req.query;
+    const { x, y, limit, filter } = req.query;
     try {
         // Find all documents
-        const Events = await Event.find();
+        const Events = await Event.find({'organizer.id': { $nin: filter }});
 
         // Calculate distances
         const EventsWithDistances = Events.map(doc => {
