@@ -154,7 +154,8 @@ app.get('/findEntity', async (req, res) => {
             res.status(200).json({ info: entity.info });
         } else {
             // Send the response as JSON
-            res.status(500).json({ message: 'Entiity not found' });
+            console.log('Find Entity error', id )
+            res.status(500).json({ message: 'Entity not found' });
         }
 
     } catch (err) {
