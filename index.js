@@ -140,20 +140,19 @@ app.get('/nearbyUsers', async (req, res) => {
     }
 });
 
-// Find User
+// Find Entity
 app.get('/findEntity', async (req, res) => {
     const { id, isUser } = req.query
 
     try {
         // Find the Entity
-        const entity = isUser ? await User.findById(id) : await Company.findById(id)
+        const entity = isUser === 'true' ? await User.findById(id) : await Company.findById(id)
 
         // Send the response as JSON
         if (entity) {
             // Send the response as JSON
             res.status(200).json({ info: entity.info });
         } else {
-            // Send the response as JSON
             console.log('Find Entity error', id )
             res.status(500).json({ message: 'Entity not found' });
         }
