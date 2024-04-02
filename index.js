@@ -142,21 +142,44 @@ app.get('/nearbyUsers', async (req, res) => {
 
 // Find Entity
 app.get('/findEntity', async (req, res) => {
-    const { id, isUser } = req.query
+    const { id, isUser, productIDs } = req.query;
 
     try {
-        // Find the Entity
-        const entity = isUser === 'true' ? await User.findById(id) : await Company.findById(id)
+        let entity;
 
-        // Send the response as JSON
-        if (entity) {
-            // Send the response as JSON
-            res.status(200).json({ info: entity.info });
+        if (isUser === 'true') {
+            // Find the User
+            entity = await User.findById(id);
         } else {
-            console.log('Find Entity error', id )
-            res.status(500).json({ message: 'Entity not found' });
+            // Find the Company
+            entity = await Company.findById(id);
         }
 
+        if (entity) {
+            if (productIDs && isUser === 'false' && entity.product_categories) {
+                // Filter products based on productIDs if isUser is false and the entity is a Company
+                const filteredProducts = [];
+
+                for (const category of entity.product_categories) {
+                    for (const subCategory of category.subCategories) {
+                        for (const product of subCategory.products) {
+                            if (productIDs.includes(product._id)) {
+                                filteredProducts.push(product);
+                            }
+                        }
+                    }
+                }
+
+                // Send the response with filtered products
+                res.status(200).json({ info: entity.info, products: filteredProducts });
+            } else {
+                // Send the response with entity info
+                res.status(200).json({ info: entity.info });
+            }
+        } else {
+            console.log('Find Entity error', id);
+            res.status(404).json({ message: 'Entity not found' });
+        }
     } catch (err) {
         // Handle any errors
         res.status(500).send(err.message);
@@ -520,8 +543,8 @@ app.get('/fetchCommunities', async (req, res) => {
 
     try {
         // Find all documents
-        const AreaDocs = await Community.find({ 'managed_by': { $nin: filter },'details.global': false });
-        const GlobalDocs = await Community.find({'managed_by': { $nin: filter }, 'details.global': true });
+        const AreaDocs = await Community.find({ 'managed_by': { $nin: filter }, 'details.global': false });
+        const GlobalDocs = await Community.find({ 'managed_by': { $nin: filter }, 'details.global': true });
 
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
@@ -586,7 +609,7 @@ app.get('/fetchEvents', async (req, res) => {
     const { x, y, limit, filter } = req.query;
     try {
         // Find all documents
-        const Events = await Event.find({'organizer.id': { $nin: filter }});
+        const Events = await Event.find({ 'organizer.id': { $nin: filter } });
 
         // Calculate distances
         const EventsWithDistances = Events.map(doc => {
