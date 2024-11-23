@@ -583,13 +583,12 @@ app.get('/fetchCommunities', async (req, res) => {
 });
 
 // Update Community
-// Update User Info
 app.put('/updateCommunityInfo/:id', async (req, res) => {
     const updatedInfo = req.body; // The updated Company data
 
     try {
         const community = await Community.findById(req.params.id);
-        const objectKeys = Object.keys(request.params)
+        const objectKeys = Object.keys(updatedInfo)
 
         if (!community) {
             return res.status(404).json({ message: 'Community not found' });

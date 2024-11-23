@@ -9,6 +9,10 @@ const CommunitySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    contact: {
+        type: {},
+        required: true
+    },
     description: {
         type: String,
         required: true
@@ -22,14 +26,10 @@ const CommunitySchema = new mongoose.Schema({
         default: []
     },
     managed_by: {
-        type: String,
+        type: [],
         required: true
     },
     images: {
-        type: [],
-        default: []
-    },
-    videos: {
         type: [],
         default: []
     }
