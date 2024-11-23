@@ -58,6 +58,6 @@ const CommunitySchema = new mongoose.Schema({
         required: true
     }
 })
- 
+
 const Community = mongoose.model('Community', CommunitySchema)
 module.exports = Community
