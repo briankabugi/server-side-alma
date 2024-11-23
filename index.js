@@ -432,16 +432,10 @@ app.get('/fetchProducts/:id', async (req, res) => {
 
 // Get Popular Companies
 app.get('/popularCompanies', (req, res) => {
-    const { filter, x, y, limit } = req.query;
-
-    let query = {};
-
-    if (filter && filter.length > 0) {
-        query._id = { $nin: filter };
-    }
+    const { x, y, limit } = req.query;
 
     // Query the database for the 10 most popular documents based on popularity
-    Company.find(query)
+    Company.find()
         .select('_id info reviews statistics communities')
         .sort({ 'statistics.popularity': -1 })
         .limit(parseInt(limit))
@@ -539,12 +533,12 @@ app.post('/createCommunity', async (req, res) => {
 
 // Fetch Communities
 app.get('/fetchCommunities', async (req, res) => {
-    const { x, y, limit, filter } = req.query;
+    const { x, y, limit } = req.query;
 
     try {
         // Find all documents
-        const AreaDocs = await Community.find({ 'managed_by': { $nin: filter }, 'details.global': false });
-        const GlobalDocs = await Community.find({ 'managed_by': { $nin: filter }, 'details.global': true });
+        const AreaDocs = await Community.find({ 'details.global': false });
+        const GlobalDocs = await Community.find({ 'details.global': true });
 
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {

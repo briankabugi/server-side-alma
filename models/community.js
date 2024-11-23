@@ -5,6 +5,22 @@ const CommunitySchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    openAccess: {
+        type: Boolean,
+        required: True
+    },
+    global: {
+        type: Boolean,
+        required: True
+    },
+    radius: {
+        type: String,
+        required: False
+    },
+    location: {
+        type: String,
+        required: False
+    },
     logo: {
         type: String,
         required: true
@@ -17,21 +33,29 @@ const CommunitySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    details: {
-        type: {},
-        required: true
-    },
     members: {
         type: [],
         default: []
     },
-    managed_by: {
-        type: [],
+    superAdmin:{
+        type: String,
         required: true
+    },
+    admin: {
+        type: String,
+        required: false
     },
     images: {
         type: [],
         default: []
+    },
+    messages:{
+        type: [],
+        default: []
+    },
+    createdAt: {
+        type:String,
+        required: true
     }
 })
 
