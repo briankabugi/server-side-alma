@@ -7,19 +7,19 @@ const CommunitySchema = new mongoose.Schema({
     },
     openAccess: {
         type: Boolean,
-        required: True
+        required: true
     },
     global: {
         type: Boolean,
-        required: True
+        required: true
     },
     radius: {
         type: String,
-        required: False
+        required: false
     },
     location: {
         type: String,
-        required: False
+        required: false
     },
     logo: {
         type: String,
@@ -54,10 +54,10 @@ const CommunitySchema = new mongoose.Schema({
         default: []
     },
     createdAt: {
-        type:String,
+        type: String,
         required: true
     }
 })
-
+ 
 const Community = mongoose.model('Community', CommunitySchema)
 module.exports = Community
