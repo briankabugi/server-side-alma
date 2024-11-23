@@ -537,8 +537,8 @@ app.get('/fetchCommunities', async (req, res) => {
 
     try {
         // Find all documents
-        const AreaDocs = await Community.find({ 'details.global': false });
-        const GlobalDocs = await Community.find({ 'details.global': true });
+        const AreaDocs = await Community.find({ 'global': false });
+        const GlobalDocs = await Community.find({ 'global': true });
 
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
