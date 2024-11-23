@@ -114,7 +114,7 @@ app.post('/searchUsername', async (req, res) => {
         // Perform a text search using the search term
         const results = await User.find({
             $text: { $search: searchTerm } // This will automatically use the 'text' index
-        }).select('info').sort({ score: { $meta: 'textScore' } }).limit(limitNumber); // Sort by text score (relevance)
+        }).sort({ score: { $meta: 'textScore' } }).limit(limitNumber).select('info'); // Sort by text score (relevance)
 
         res.json(results); // Send the results as JSON
     } catch (error) {
