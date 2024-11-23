@@ -582,6 +582,37 @@ app.get('/fetchCommunities', async (req, res) => {
     }
 });
 
+// Update Community
+// Update User Info
+app.put('/updateCommunityInfo/:id', async (req, res) => {
+    const updatedInfo = req.body; // The updated Company data
+
+    try {
+        const community = await Community.findById(req.params.id);
+        const objectKeys = Object.keys(request.params)
+
+        if (!community) {
+            return res.status(404).json({ message: 'Community not found' });
+        } else {
+            try {
+                for(i; i<objectKeys.length;i++){
+                    community[objectKeys[i]]=request.params[objectKeys[i]]
+                }
+
+                // Save the updated Community
+                await community.save();
+
+                res.status(200).json({ message: 'Community Updated' })
+            } catch (error) {
+                res.status(500).json({ error: error.message })
+            }
+        }
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+})
+
 // Create Event
 app.post('/createEvent', async (req, res) => {
     //Extract Parameters
