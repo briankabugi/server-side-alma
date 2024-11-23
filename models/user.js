@@ -27,5 +27,6 @@ const UserSchema = new mongoose.Schema({
     }
 })
 
+UserSchema.index({ 'info.name': 'text' }, { name: 'username_index' });
 const User = mongoose.model('User', UserSchema)
 module.exports = User

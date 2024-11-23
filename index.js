@@ -105,6 +105,22 @@ app.get('/fetchUsers', async (req, res) => {
     }
 })
 
+// Search Users by UserName
+app.post('/searchUsername', async (req, res) => {
+    const { searchTerm } = req.body;
+  
+    try {
+      // Perform a text search using the search term
+      const results = await User.find({
+        $text: { $search: searchTerm } // This will automatically use the 'text' index
+      }).sort({ score: { $meta: 'textScore' } }); // Sort by text score (relevance)
+  
+      res.json(results); // Send the results as JSON
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
 // Get Nearest Users
 app.get('/nearbyUsers', async (req, res) => {
     const { x, y, limit } = req.query;
