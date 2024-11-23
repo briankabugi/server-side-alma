@@ -109,18 +109,18 @@ app.get('/fetchUsers', async (req, res) => {
 app.post('/searchUsername', async (req, res) => {
     const { searchTerm, limit } = req.body;
     const limitNumber = Number.isInteger(limit) && limit > 0 ? limit : 10;
-  
+
     try {
-      // Perform a text search using the search term
-      const results = await User.find({
-        $text: { $search: searchTerm } // This will automatically use the 'text' index
-      }).sort({ score: { $meta: 'textScore' } }).limit(limitNumber); // Sort by text score (relevance)
-  
-      res.json(results); // Send the results as JSON
+        // Perform a text search using the search term
+        const results = await User.find({
+            $text: { $search: searchTerm } // This will automatically use the 'text' index
+        }).select('info').sort({ score: { $meta: 'textScore' } }).limit(limitNumber); // Sort by text score (relevance)
+
+        res.json(results); // Send the results as JSON
     } catch (error) {
-      res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
-  });
+});
 
 // Get Nearest Users
 app.get('/nearbyUsers', async (req, res) => {
@@ -605,8 +605,8 @@ app.put('/updateCommunityInfo/:id', async (req, res) => {
             return res.status(404).json({ message: 'Community not found' });
         } else {
             try {
-                for(i; i<objectKeys.length;i++){
-                    community[objectKeys[i]]=request.params[objectKeys[i]]
+                for (i; i < objectKeys.length; i++) {
+                    community[objectKeys[i]] = request.params[objectKeys[i]]
                 }
 
                 // Save the updated Community
