@@ -106,43 +106,21 @@ app.get('/fetchUsers', async (req, res) => {
 })
 
 // Search Users by UserName
-app.get('/searchUsername', async (req, res) => {
-    const { searchTerm } = req.query;
-  
-    // Validate the searchTerm
-    if (!searchTerm || typeof searchTerm !== 'string' || searchTerm.trim() === '') {
-      return res.status(400).json({ error: 'Invalid or missing search term' });
-    }
+app.post('/searchUsername', async (req, res) => {
+    const { searchTerm, limit } = req.body;
+    const limitNumber = Number.isInteger(limit) && limit > 0 ? limit : 10;
   
     try {
       // Perform a text search using the search term
       const results = await User.find({
         $text: { $search: searchTerm } // This will automatically use the 'text' index
-      })
-      .select('info') // Project only the 'info' field
-      .sort({ score: { $meta: 'textScore' } }); // Sort by text score (relevance)
+      }).sort({ score: { $meta: 'textScore' } }).limit(limitNumber); // Sort by text score (relevance)
   
-      // Check if any results were found
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'No users found matching the search term' });
-      }
-  
-      // Return the results as JSON (only the 'info' field will be included)
-      res.json(results);
-  
+      res.json(results); // Send the results as JSON
     } catch (error) {
-      console.error('Error during search:', error);
-      
-      // Handle MongoDB or server-related errors
-      if (error.name === 'MongoError') {
-        return res.status(500).json({ error: 'MongoDB error occurred during search' });
-      }
-  
-      // Generic server error
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error.message });
     }
   });
-  
 
 // Get Nearest Users
 app.get('/nearbyUsers', async (req, res) => {
