@@ -118,6 +118,7 @@ app.post('/searchUsername', async (req, res) => {
       res.json(results); // Send the results as JSON
     } catch (error) {
       res.status(500).json({ error: error.message });
+      console.error('Ola! Server Search Error; ', error.message)
     }
   });
 
