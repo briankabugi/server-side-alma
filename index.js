@@ -590,6 +590,38 @@ app.get('/fetchCommunities', async (req, res) => {
     }
 });
 
+// Delete Community
+app.delete('/deleteCommunity', async (req, res) => {
+    const { communityId } = req.body;
+  
+    // Validate that communityId is provided
+    if (!communityId) {
+      return res.status(400).json({ error: 'communityId is required' });
+    }
+  
+    // Check if the provided ID is a valid MongoDB ObjectId format (even if it's a string)
+    if (!mongoose.Types.ObjectId.isValid(communityId)) {
+      return res.status(400).json({ error: 'Invalid communityId format' });
+    }
+  
+    try {
+      // Find and delete the community by ID
+      const community = await Community.findByIdAndDelete(communityId);
+  
+      // If the community is not found
+      if (!community) {
+        return res.status(404).json({ error: 'Community not found' });
+      }
+  
+      // Respond with success message
+      res.status(200).json({ message: 'Community deleted successfully' });
+    } catch (err) {
+      console.error(err);
+      // Handle server errors
+      res.status(500).json({ error: 'An error occurred while deleting the community' });
+    }
+  });
+
 // Update Community
 app.put('/updateCommunityInfo', async (req, res) => {
     const {updatedInfo} = req.body; // The updated Company data
