@@ -592,7 +592,7 @@ app.get('/fetchCommunities', async (req, res) => {
 
 // Update Community
 app.put('/updateCommunityInfo', async (req, res) => {
-    const updatedInfo = req.body; // The updated Company data
+    const {updatedInfo} = req.body; // The updated Company data
 
     try {
         await Community.updateOne(
