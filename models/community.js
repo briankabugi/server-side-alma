@@ -15,11 +15,11 @@ const CommunitySchema = new mongoose.Schema({
     },
     radius: {
         type: String,
-        required: false
+        required: true
     },
     location: {
-        type: String,
-        required: false
+        type: {},
+        required: true
     },
     logo: {
         type: String,
@@ -27,7 +27,7 @@ const CommunitySchema = new mongoose.Schema({
     },
     contact: {
         type: {},
-        required: true
+        required: false
     },
     description: {
         type: String,
