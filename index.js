@@ -592,26 +592,21 @@ app.get('/fetchCommunities', async (req, res) => {
 
 // Update Community
 app.put('/updateCommunityInfo', async (req, res) => {
-    const updatedInfo = req.body; // The updated community data
+    const updatedInfo = req.body; // The updated Company data
 
     try {
-        // Use await instead of .then() to handle the promise
-        const result = await Community.updateOne(
+        await Community.updateOne(
             { _id: updatedInfo._id },
             { $set: updatedInfo }
-        );
-        
-        // Check if the update was successful
-        if (result.modifiedCount > 0) {
-            res.status(200).json({ message: 'Community Updated' });
-        } else {
-            res.status(400).json({ message: 'No changes made or community not found' });
-        }
+        ).then(
+            res.status(200).json({ message: 'Community Updated' })
+        ).catch(
+            (error)=>res.status(500).json({error: error.message})
+        )
     } catch (error) {
-        // Handle errors
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message })
     }
-});
+})
 
 // Create Event
 app.post('/createEvent', async (req, res) => {
