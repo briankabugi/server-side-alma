@@ -592,21 +592,21 @@ app.get('/fetchCommunities', async (req, res) => {
 
 // Delete Community
 app.delete('/deleteCommunity', async (req, res) => {
-    const { communityId } = req.body;
+    const { communityID } = req.body;
   
     // Validate that communityId is provided
-    if (!communityId) {
-      return res.status(400).json({ error: 'communityId is required' });
+    if (!communityID) {
+      return res.status(400).json({ error: 'communityID is required' });
     }
   
     // Check if the provided ID is a valid MongoDB ObjectId format (even if it's a string)
-    if (!mongoose.Types.ObjectId.isValid(communityId)) {
-      return res.status(400).json({ error: 'Invalid communityId format' });
+    if (!mongoose.Types.ObjectId.isValid(communityID)) {
+      return res.status(400).json({ error: 'Invalid communityID format' });
     }
   
     try {
       // Find and delete the community by ID
-      const community = await Community.findByIdAndDelete(communityId);
+      const community = await Community.findByIdAndDelete(communityID);
   
       // If the community is not found
       if (!community) {
