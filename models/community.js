@@ -14,7 +14,7 @@ const CommunitySchema = new mongoose.Schema({
         required: true
     },
     radius: {
-        type: String,
+        type: Number,
         required: true
     },
     location: {
@@ -56,6 +56,10 @@ const CommunitySchema = new mongoose.Schema({
     createdAt: {
         type: String,
         required: true
+    },
+    popularity: {
+        type: Number,
+        default: 0
     }
 })
 

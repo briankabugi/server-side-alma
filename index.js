@@ -561,7 +561,6 @@ app.get('/fetchCommunities', async (req, res) => {
 
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
-            let total_distance = 0;
             const { latitude, longitude } = doc.location; // Accessing the location directly as a dictionary
             const R = 6371;
             const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
@@ -577,7 +576,7 @@ app.get('/fetchCommunities', async (req, res) => {
 
         // Sort documents by their calculated distances in ascending order
         const SortedAreaDocs = AreaDocsWithDistances.sort((a, b) => a.average_distance - b.average_distance);
-        const SortedGlobalDocs = GlobalDocs.sort((a, b) => b.details.popularity - a.details.popularity);
+        const SortedGlobalDocs = GlobalDocs.sort((a, b) => b.popularity - a.popularity);
 
         // Return the top n documents
         const nearestByArea = SortedAreaDocs.slice(0, limit);
