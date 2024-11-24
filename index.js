@@ -562,21 +562,17 @@ app.get('/fetchCommunities', async (req, res) => {
         // Calculate distances
         const AreaDocsWithDistances = AreaDocs.map(doc => {
             let total_distance = 0;
-            for (const location of doc.details.locations) {
-                const { latitude, longitude } = location;
-                const R = 6371;
-                const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
-                const dLon = (longitude - y) * Math.PI / 180; // Corrected longitude - y
-                const a =
-                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
-                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
-                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-                const distance = R * c;
-                total_distance += distance;
-            }
-            const average_distance = total_distance / doc.details.locations.length;
-            return { ...doc.toObject(), average_distance };
+            const { latitude, longitude } = doc.location; // Accessing the location directly as a dictionary
+            const R = 6371;
+            const dLat = (latitude - x) * Math.PI / 180; // Corrected latitude - x
+            const dLon = (longitude - y) * Math.PI / 180; // Corrected longitude - y
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return { ...doc.toObject(), average_distance: distance };
         });
 
         // Sort documents by their calculated distances in ascending order
