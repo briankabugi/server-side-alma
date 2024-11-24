@@ -535,10 +535,10 @@ app.post('/createCommunity', async (req, res) => {
 
     try {
         // Create New user Object
-        const createdCommunity = await new Community(newCommunity)
+        const createdCommunity = new Community(newCommunity)
 
         //Save to database
-        createdCommunity.save().then(() => {
+        await createdCommunity.save().then(() => {
             res.status(200).json({ message: 'Community Created' })
         }).catch((error) => {
             res.status(500).json({ error: error.message })
