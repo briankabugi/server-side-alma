@@ -591,32 +591,20 @@ app.get('/fetchCommunities', async (req, res) => {
 });
 
 // Update Community
-app.put('/updateCommunityInfo/:id', async (req, res) => {
+app.put('/updateCommunityInfo', async (req, res) => {
     const updatedInfo = req.body; // The updated Company data
 
     try {
-        const community = await Community.findById(req.params.id);
-        const objectKeys = Object.keys(updatedInfo)
-
-        if (!community) {
-            return res.status(404).json({ message: 'Community not found' });
-        } else {
-            try {
-                for (i; i < objectKeys.length; i++) {
-                    community[objectKeys[i]] = request.params[objectKeys[i]]
-                }
-
-                // Save the updated Community
-                await community.save();
-
-                res.status(200).json({ message: 'Community Updated' })
-            } catch (error) {
-                res.status(500).json({ error: error.message })
-            }
-        }
-
+        await Community.updateOne(
+            { _id: updatedInfo._id },
+            { $set: updatedInfo }
+        ).then(
+            res.status(200).json({ message: 'Community Updated' })
+        ).catch(
+            (error)=>res.status(500).json({error: error.message})
+        )
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message })
     }
 })
 
