@@ -664,10 +664,10 @@ app.post('/createEvent', async (req, res) => {
 
 // Fetch Events
 app.get('/fetchEvents', async (req, res) => {
-    const { x, y, limit, filter } = req.query;
+    const { x, y, limit } = req.query;
     try {
         // Find all documents
-        const Events = await Event.find({ 'organizer.id': { $nin: filter } });
+        const Events = await Event.find();
 
         // Calculate distances
         const EventsWithDistances = Events.map(doc => {
