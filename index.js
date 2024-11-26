@@ -692,6 +692,23 @@ app.get('/fetchEvents', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+// Update Community
+app.put('/updateEventInfo', async (req, res) => {
+    const {updatedInfo} = req.body; // The updated Company data
+
+    try {
+        await Event.updateOne(
+            { _id: updatedInfo._id },
+            { $set: updatedInfo }
+        ).then(
+            res.status(200).json({ message: 'Community Updated' })
+        ).catch(
+            (error)=>res.status(500).json({error: error.message})
+        )
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
 
 // Delete Event
 app.delete('/deleteEvent', async (req, res) => {
