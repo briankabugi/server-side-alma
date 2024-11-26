@@ -693,6 +693,17 @@ app.get('/fetchEvents', async (req, res) => {
     }
 })
 
+// Delete Event
+app.delete('/deleteEvent', async (req, res) => {
+    const {eventID} = req.body
+    try {
+        await Event.deleteOne({ _id: eventID });
+        res.status(200).json({ message: 'Company Deleted' })
+    } catch (err) {
+        res.status(500).json({ message: 'Error on Server Side' });
+    }
+});
+
 // Search Functionality
 app.get('/search', async (req, res) => {
     try {
