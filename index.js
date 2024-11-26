@@ -698,7 +698,7 @@ app.delete('/deleteEvent', async (req, res) => {
     const {eventID} = req.body
     try {
         await Event.deleteOne({ _id: eventID });
-        res.status(200).json({ message: 'Company Deleted' })
+        res.status(200).json({ message: 'Event Deleted' })
     } catch (err) {
         res.status(500).json({ message: 'Error on Server Side' });
     }
