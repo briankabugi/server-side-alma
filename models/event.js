@@ -13,7 +13,7 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    date: {
+    dates: {
         type: [],
         required: true
     },
@@ -29,9 +29,17 @@ const EventSchema = new mongoose.Schema({
         type: [],
         default: []
     },
-    public: {
+    openAccess: {
         type: Boolean,
         required: true
+    },
+    online: {
+        type: Boolean,
+        required: true
+    },
+    link: {
+        type: String,
+        required: false
     }
 })
 

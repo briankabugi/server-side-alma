@@ -692,6 +692,7 @@ app.get('/fetchEvents', async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 })
+
 // Update Community
 app.put('/updateEventInfo', async (req, res) => {
     const {updatedInfo} = req.body; // The updated Company data
@@ -701,7 +702,7 @@ app.put('/updateEventInfo', async (req, res) => {
             { _id: updatedInfo._id },
             { $set: updatedInfo }
         ).then(
-            res.status(200).json({ message: 'Community Updated' })
+            res.status(200).json({ message: 'Event Updated' })
         ).catch(
             (error)=>res.status(500).json({error: error.message})
         )
