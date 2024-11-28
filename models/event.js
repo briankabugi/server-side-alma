@@ -14,7 +14,7 @@ const EventSchema = new mongoose.Schema({
         required: true
     },
     dates: {
-        type: [],
+        type: [[Date]],
         required: true
     },
     location: {
