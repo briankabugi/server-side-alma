@@ -81,7 +81,7 @@ app.post('/login', async (req, res) => {
             bcrypt.compare(code, user.code).then(verified => {
                 if (verified) {
                     const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-                    res.status(200).json({ userID: user._id, token: token, info: user.info, preferences: user.preferences, friends: user.friends, events: user.events })
+                    res.status(200).json({ userID: user._id, token: token, info: user.info, preferences: user.preferences, friends: user.friends, events: user.events, locations: user.locations })
                 } else {
                     res.status(500).json({ message: 'Check password and try again' })
                 }
@@ -98,7 +98,7 @@ app.post('/login', async (req, res) => {
 // Fetch All Users
 app.get('/fetchUsers', async (req, res) => {
     try {
-        const users = await User.find({})
+        const users = await User.find({}).select('info')
         res.status(200).json({ users: users })
     } catch (error) {
         res.status(500).message('Internal Server Error')
@@ -215,6 +215,34 @@ app.put('/updateUserInfo/:id', async (req, res) => {
         } else {
             try {
                 user.info = updatedInfo;
+
+                // Save the updated User
+                await user.save();
+
+                res.status(200).json({ message: 'Saved' })
+            } catch (error) {
+                res.status(500).json({ error: error.message })
+            }
+
+        }
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+})
+
+//Update Locations
+app.put('/updateUserLocations/:id', async (req, res) => {
+    const locations = req.body; // The updated Company data
+
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        } else {
+            try {
+                user.locations = locations;
 
                 // Save the updated User
                 await user.save();
@@ -593,38 +621,38 @@ app.get('/fetchCommunities', async (req, res) => {
 // Delete Community
 app.delete('/deleteCommunity', async (req, res) => {
     const { communityID } = req.body;
-  
+
     // Validate that communityId is provided
     if (!communityID) {
-      return res.status(400).json({ error: 'communityID is required' });
+        return res.status(400).json({ error: 'communityID is required' });
     }
-  
+
     // Check if the provided ID is a valid MongoDB ObjectId format (even if it's a string)
     if (!mongoose.Types.ObjectId.isValid(communityID)) {
-      return res.status(400).json({ error: 'Invalid communityID format' });
+        return res.status(400).json({ error: 'Invalid communityID format' });
     }
-  
+
     try {
-      // Find and delete the community by ID
-      const community = await Community.findByIdAndDelete(communityID);
-  
-      // If the community is not found
-      if (!community) {
-        return res.status(404).json({ error: 'Community not found' });
-      }
-  
-      // Respond with success message
-      res.status(200).json({ message: 'Community deleted successfully' });
+        // Find and delete the community by ID
+        const community = await Community.findByIdAndDelete(communityID);
+
+        // If the community is not found
+        if (!community) {
+            return res.status(404).json({ error: 'Community not found' });
+        }
+
+        // Respond with success message
+        res.status(200).json({ message: 'Community deleted successfully' });
     } catch (err) {
-      console.error(err);
-      // Handle server errors
-      res.status(500).json({ error: 'An error occurred while deleting the community' });
+        console.error(err);
+        // Handle server errors
+        res.status(500).json({ error: 'An error occurred while deleting the community' });
     }
-  });
+});
 
 // Update Community
 app.put('/updateCommunityInfo', async (req, res) => {
-    const {updatedInfo} = req.body; // The updated Company data
+    const { updatedInfo } = req.body; // The updated Company data
 
     try {
         await Community.updateOne(
@@ -633,7 +661,7 @@ app.put('/updateCommunityInfo', async (req, res) => {
         ).then(
             res.status(200).json({ message: 'Community Updated' })
         ).catch(
-            (error)=>res.status(500).json({error: error.message})
+            (error) => res.status(500).json({ error: error.message })
         )
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -695,7 +723,7 @@ app.get('/fetchEvents', async (req, res) => {
 
 // Update Community
 app.put('/updateEventInfo', async (req, res) => {
-    const {updatedInfo} = req.body; // The updated Company data
+    const { updatedInfo } = req.body; // The updated Company data
 
     try {
         await Event.updateOne(
@@ -704,7 +732,7 @@ app.put('/updateEventInfo', async (req, res) => {
         ).then(
             res.status(200).json({ message: 'Event Updated' })
         ).catch(
-            (error)=>res.status(500).json({error: error.message})
+            (error) => res.status(500).json({ error: error.message })
         )
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -713,7 +741,7 @@ app.put('/updateEventInfo', async (req, res) => {
 
 // Delete Event
 app.delete('/deleteEvent', async (req, res) => {
-    const {eventID} = req.body
+    const { eventID } = req.body
     try {
         await Event.deleteOne({ _id: eventID });
         res.status(200).json({ message: 'Event Deleted' })

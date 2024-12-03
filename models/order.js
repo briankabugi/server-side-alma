@@ -16,6 +16,10 @@ const OrderSchema = new mongoose.Schema({
     status: {
         type: String,
         default: 'pending'
+    },
+    agent: {
+        type: String,
+        required: false
     }
 })
 
