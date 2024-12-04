@@ -4,7 +4,7 @@ const OrderSchema = new mongoose.Schema({
     buyer: {
         type: {},
         required: true
-    }, 
+    },
     date: {
         type: Date,
         required: true
@@ -20,6 +20,10 @@ const OrderSchema = new mongoose.Schema({
     agent: {
         type: String,
         required: false
+    },
+    location: {
+        type: {},
+        required: true
     }
 })
 
