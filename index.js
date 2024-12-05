@@ -157,6 +157,69 @@ app.get('/nearbyUsers', async (req, res) => {
     }
 });
 
+// Add agent
+app.put('updateAgent/:id', async (req, res) => {
+    const agentData = req.body; // The updated Company data
+
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        } else {
+            try {
+                user.agent = agentData;
+
+                // Save the updated User
+                await user.save();
+
+                res.status(200).json({ message: 'Saved' })
+            } catch (error) {
+                res.status(500).json({ error: error.message })
+            }
+
+        }
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+})
+
+// Get Nearest Users
+app.get('/nearbyAgents', async (req, res) => {
+    const { x, y, limit } = req.query;
+
+    try {
+        // Find all documents
+        const allAgents = await User.find({ agent: { $exists: true } })
+            .select('_id info agent');
+
+        // Calculate distances
+        const agentsWithDistances = allAgents.map(agent => {
+            const { latitude, longitude } = agent.info.location;
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (x - latitude) * Math.PI / 180;
+            const dLon = (y - longitude) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return { ...agent.toObject(), distance };
+        });
+
+        // Sort documents by their calculated distances in ascending order
+        agentsWithDistances.sort((a, b) => a.distance - b.distance);
+
+        // Return the top n documents
+        const nearbyAgents = agentsWithDistances.slice(0, parseInt(limit));
+        res.status(200).json({ nearbyAgents: nearbyAgents });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Find Entity
 app.get('/findEntity', async (req, res) => {
     const { id, isUser, productIDs } = req.query;
@@ -348,6 +411,17 @@ app.put('/removeFriends', async (req, res) => {
         res.send({ message: 'Success' });
     } catch (error) {
         res.status(500).send({ message: error.message });
+    }
+});
+
+// Delete Agent
+app.delete('/deleteAgent/:id', async (req, res) => {
+    const userID = req.params.id
+    try {
+        await User.updateOne( { _id: userID },{ $unset: { agent: "" } });
+        res.status(200).json({ message: 'Agent Account Deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error Deleting Agent Account' });
     }
 });
 

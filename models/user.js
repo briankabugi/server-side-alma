@@ -28,6 +28,10 @@ const UserSchema = new mongoose.Schema({
     code: {
         type: String,
         required: true
+    },
+    agent: {
+        type: {},
+        required: false
     }
 })
 
