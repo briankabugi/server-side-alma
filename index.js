@@ -183,7 +183,7 @@ app.put('updateAgent/:id', async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
-})
+});
 
 // Get Nearest Users
 app.get('/nearbyAgents', async (req, res) => {

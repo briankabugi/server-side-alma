@@ -5,23 +5,11 @@ const UserSchema = new mongoose.Schema({
         type: {},
         required: true
     },
-    locations: {
-        type: [],
-        required: false
-    },
-    favorites: {
-        type: {},
-        default: {}
-    },
     preferences: {
         type: {},
         default: {}
     },
-    friends: {
-        type: [],
-        default: []
-    },
-    events: {
+    socials: {
         type: [],
         default: []
     },
