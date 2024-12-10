@@ -158,7 +158,7 @@ app.get('/nearbyUsers', async (req, res) => {
 });
 
 // Add agent
-app.put('updateAgent/:id', async (req, res) => {
+app.put('/updateAgent/:id', async (req, res) => {
     const agentData = req.body; // The updated Company data
 
     try {
@@ -501,7 +501,7 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
         console.error('Error updating Company:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
-})
+});
 
 // Update Company Data
 app.put('/updateCompanyData/:id', async (req, res) => {
@@ -529,7 +529,7 @@ app.put('/updateCompanyData/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
         console.error(error.message)
     }
-})
+});
 
 // Fetch Company Data
 app.get('/fetchProducts/:id', async (req, res) => {
@@ -547,7 +547,7 @@ app.get('/fetchProducts/:id', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
-})
+});
 
 // Get Popular Companies
 app.get('/popularCompanies', (req, res) => {
