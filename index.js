@@ -562,8 +562,8 @@ app.get('/popularCompanies', (req, res) => {
             const documentsWithDistances = documents.map(doc => {
                 const { latitude, longitude } = doc.info.location;
                 const R = 6371; // Radius of the Earth in kilometers
-                const dLat = (x - latitude) * Math.PI / 180;
-                const dLon = (y - longitude) * Math.PI / 180;
+                const dLat = (parseFloat(x) - latitude) * Math.PI / 180;
+                const dLon = (parseFloat(y) - longitude) * Math.PI / 180;
                 const a =
                     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                     Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
