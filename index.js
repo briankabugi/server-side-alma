@@ -81,7 +81,7 @@ app.post('/login', async (req, res) => {
             bcrypt.compare(code, user.code).then(verified => {
                 if (verified) {
                     const token = jwt.sign({ userID: user._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
-                    res.status(200).json({ userID: user._id, token: token, info: user.info, preferences: user.preferences, events: user.events, agent: user.agent })
+                    res.status(200).json({ userID: user._id, token: token, info: user.info, preferences: user.preferences, agent: user.agent })
                 } else {
                     res.status(500).json({ message: 'Check password and try again' })
                 }
