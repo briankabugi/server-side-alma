@@ -45,7 +45,7 @@ const app_server = http.createServer(app)
 
 app_server.listen(port => {
     console.log('Server Listening on port ', port)
-})
+});
 
 // Register User
 app.post('/register', async (req, res) => {
@@ -67,7 +67,7 @@ app.post('/register', async (req, res) => {
         console.log('Could not create Account', error)
         res.status(500).json({ message: 'Could not create account' })
     })
-})
+});
 
 // Login
 app.post('/login', async (req, res) => {
@@ -103,7 +103,7 @@ app.get('/fetchUsers', async (req, res) => {
     } catch (error) {
         res.status(500).message('Internal Server Error')
     }
-})
+});
 
 // Search Users by UserName
 app.post('/searchUsername', async (req, res) => {
@@ -187,12 +187,16 @@ app.put('/updateAgent/:id', async (req, res) => {
 
 // Get Nearest Users
 app.get('/nearbyAgents', async (req, res) => {
-    const { x, y, limit } = req.query;
+    const { x, y, limit, payload } = req.query;
 
     try {
         // Find all documents
-        const allAgents = await User.find({ agent: { $exists: true } })
-            .select('_id info agent');
+        const allAgents = await User.find({ 
+            agent: { 
+                $exists: true,
+                $gte: { payload: payload }
+            }
+        }).select('_id info agent');
 
         // Calculate distances
         const agentsWithDistances = allAgents.map(agent => {
@@ -292,7 +296,7 @@ app.put('/updateUserInfo/:id', async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
-})
+});
 
 //Update Locations
 app.put('/updateUserLocations/:id', async (req, res) => {
@@ -320,7 +324,7 @@ app.put('/updateUserLocations/:id', async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
-})
+});
 
 // Update User
 app.put('/updatePreferences', async (req, res) => {
@@ -346,7 +350,7 @@ app.put('/updatePreferences', async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
-})
+});
 
 // Adding Friends
 app.put('/addFriends', async (req, res) => {
@@ -740,7 +744,7 @@ app.put('/updateCommunityInfo', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message })
     }
-})
+});
 
 // Create Event
 app.post('/createEvent', async (req, res) => {
@@ -762,7 +766,7 @@ app.post('/createEvent', async (req, res) => {
         response.status(500).json({ message: error.message })
         console.error(error.message)
     }
-})
+});
 
 // Fetch Events
 app.get('/fetchEvents', async (req, res) => {
@@ -793,7 +797,7 @@ app.get('/fetchEvents', async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: error.message })
     }
-})
+});
 
 // Update Community
 app.put('/updateEventInfo', async (req, res) => {
@@ -811,7 +815,7 @@ app.put('/updateEventInfo', async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message })
     }
-})
+});
 
 // Delete Event
 app.delete('/deleteEvent', async (req, res) => {
@@ -980,7 +984,7 @@ app.post('/createOrder', async (req, res) => {
         response.status(500).json({ message: error.message })
         console.error(error.message)
     }
-})
+});
 
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {
