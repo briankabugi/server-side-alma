@@ -239,28 +239,27 @@ app.get('/findEntity', async (req, res) => {
         }
 
         if (entity) {
-            if (productIDs && isUser === 'false' && entity.product_categories) {
                 // Filter products based on productIDs if isUser is false and the entity is a Company
-                const filteredProducts = [];
+                if (productIDs) {
+                    const filteredProducts = [];
 
-                for (const category of entity.product_categories) {
-                    for (const subCategory of category.subCategories) {
-                        for (const product of subCategory.products) {
-                            if (productIDs.includes(product.id)) {
-                                filteredProducts.push(product);
+                    for (const category of entity.product_categories) {
+                        for (const subCategory of category.subCategories) {
+                            for (const product of subCategory.products) {
+                                if (productIDs.includes(product.id)) {
+                                    filteredProducts.push(product);
+                                }
                             }
                         }
                     }
+                    // Send the response with filtered products
+                    res.status(200).json({ info: entity.info, products: filteredProducts });
+                } else {
+                    // Send the response with entity info
+                    res.status(200).json({ info: entity.info });
                 }
-
-                // Send the response with filtered products
-                res.status(200).json({ info: entity.info, products: filteredProducts });
-            } else {
-                // Send the response with entity info
-                res.status(200).json({ info: entity.info });
-            }
         } else {
-            console.log('Find Entity error', id);
+            console.log('Find Entity error');
             res.status(404).json({ message: 'Entity not found' });
         }
     } catch (err) {
@@ -421,7 +420,7 @@ app.put('/removeFriends', async (req, res) => {
 app.delete('/deleteAgent/:id', async (req, res) => {
     const userID = req.params.id
     try {
-        await User.updateOne( { _id: userID },{ $unset: { agent: "" } });
+        await User.updateOne({ _id: userID }, { $unset: { agent: "" } });
         res.status(200).json({ message: 'Agent Account Deleted' });
     } catch (err) {
         res.status(500).json({ message: 'Error Deleting Agent Account' });
