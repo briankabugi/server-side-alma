@@ -157,7 +157,7 @@ app.get('/nearbyUsers', async (req, res) => {
     }
 });
 
-// Add agent
+// Update agent
 app.put('/updateAgent/:id', async (req, res) => {
     const agentData = req.body; // The updated Company data
 
@@ -1004,5 +1004,44 @@ app.get('/fetchOrders', async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 });
+
+// Update Order
+app.put('/cancelOrder/:id', async (req, res) => {
+
+    try {
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        } else {
+            try {
+                order.status = 'cancelled';
+
+                // Save the updated User
+                await order.save();
+
+                res.status(200).json({ message: 'Order Cancelled' })
+            } catch (error) {
+                res.status(500).json({ error: error.message })
+            }
+        }
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete Order
+app.delete('/deleteOrder', async (req, res) => {
+    const { orderID } = req.body
+    try {
+        await Order.deleteOne({ _id: orderID });
+        res.status(200).json({ message: 'Order Deleted' })
+    } catch (err) {
+        res.status(500).json({ message: 'Error on Server Side' });
+    }
+});
+
+
 
 
