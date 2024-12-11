@@ -993,7 +993,7 @@ app.get('/fetchOrders', async (req, res) => {
     try {
         const conditions = [
             { buyer: { $in: ids } },
-            ...ids.map(id => ({ [`products.${id}`]: { $exists: true } }))
+            ...ids.map(id => ({ [`enterprises.${id}`]: { $exists: true } }))
         ];
 
         const orders = await Order.find({ $or: conditions });
