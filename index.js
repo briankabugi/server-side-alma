@@ -190,11 +190,10 @@ app.get('/nearbyAgents', async (req, res) => {
     const { x, y, limit, payload } = req.query;
 
     try {
-        // Find all documents
-        const allAgents = await User.find({ 
-            agent: { 
+        const allAgents = await User.find({
+            agent: {
                 $exists: true,
-                $gte: { payload: payload }
+                "agent.payload": { $gte: payload }
             }
         }).select('_id info agent');
 
