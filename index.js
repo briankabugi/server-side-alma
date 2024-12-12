@@ -230,50 +230,47 @@ app.get('/findEntity', async (req, res) => {
     try {
         let entity;
 
-        if (isUser === 'true') {
-            // Find the User
-            entity = await User.findById(id);
-        } else {
-            // Find the Company
-            entity = await Company.findById(id);
-        }
+        // Find the entity based on user or company
+        entity = isUser === 'true' ? await User.findById(id) : await Company.findById(id);
 
         if (entity) {
-            // Filter products based on productIDs if isUser is false and the entity is a Company
+            // If productIDs are provided, filter the products accordingly
             if (productIDs) {
                 const filteredCategories = {};
 
+                // Iterate over product categories, subcategories, and products
                 for (const category of entity.product_categories) {
-                    const categoryName =category.name
-                    for (const subCategory of category.subCategories) {
-                        const subCategoryName = subCategory.name
-                        for (const product of subCategory.products) {
-                            if (productIDs.includes(product.id)) {
-                                if (filteredCategories.categoryName) {
-                                    if (filteredCategories[categoryName][subCategoryName]) {
-                                        filteredCategories[categoryName][subCategoryName].push(product)
-                                    } else {
-                                        filteredCategories[categoryName][subCategoryName] = [product]
-                                    }
-                                } else {
-                                    filteredCategories[categoryName] = {
-                                        subCategoryName: [product]
-                                    }
-                                }
+                    const { name: categoryName, subCategories } = category;
+
+                    // For each subcategory, we map it to a structure and filter based on product IDs
+                    for (const subCategory of subCategories) {
+                        const { name: subCategoryName, products } = subCategory;
+
+                        // Filter products that match the provided product IDs
+                        const filteredProducts = products.filter(product =>
+                            productIDs.includes(product.id)
+                        );
+
+                        // If there are matching products, add them to the filtered categories
+                        if (filteredProducts.length > 0) {
+                            if (!filteredCategories[categoryName]) {
+                                filteredCategories[categoryName] = {};
                             }
+                            filteredCategories[categoryName][subCategoryName] = filteredProducts;
                         }
                     }
                 }
+
                 // Send the response with filtered products
-                res.status(200).json({ info: entity.info, products: filteredCategories });
-            } else {
-                // Send the response with entity info
-                res.status(200).json({ info: entity.info });
+                return res.status(200).json({ info: entity.info, products: filteredCategories });
             }
-        } else {
-            console.log('Find Entity error');
-            res.status(404).json({ message: 'Entity not found' });
+
+            // If no product IDs are provided, send the response with only entity info
+            return res.status(200).json({ info: entity.info });
         }
+
+        console.log('Entity not found');
+        res.status(404).json({ message: 'Entity not found' });
     } catch (err) {
         // Handle any errors
         res.status(500).send(err.message);
