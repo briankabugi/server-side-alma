@@ -244,18 +244,20 @@ app.get('/findEntity', async (req, res) => {
                 const filteredCategories = {};
 
                 for (const category of entity.product_categories) {
+                    const categoryName =category.name
                     for (const subCategory of category.subCategories) {
+                        const subCategoryName = subCategory.name
                         for (const product of subCategory.products) {
                             if (productIDs.includes(product.id)) {
-                                if (filteredCategories.category) {
-                                    if (filteredCategories.category.subCategory) {
-                                        filteredCategories.category.subcategory.push(product)
+                                if (filteredCategories.categoryName) {
+                                    if (filteredCategories[categoryName][subCategoryName]) {
+                                        filteredCategories[categoryName][subCategoryName].push(product)
                                     } else {
-                                        filteredCategories.category.subcategory = [product]
+                                        filteredCategories[categoryName][subCategoryName] = [product]
                                     }
                                 } else {
-                                    filteredCategories.category = {
-                                        subCategory: [product]
+                                    filteredCategories[categoryName] = {
+                                        subCategoryName: [product]
                                     }
                                 }
                             }
