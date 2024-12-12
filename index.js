@@ -239,25 +239,35 @@ app.get('/findEntity', async (req, res) => {
         }
 
         if (entity) {
-                // Filter products based on productIDs if isUser is false and the entity is a Company
-                if (productIDs) {
-                    const filteredProducts = [];
+            // Filter products based on productIDs if isUser is false and the entity is a Company
+            if (productIDs) {
+                const filteredCategories = {};
 
-                    for (const category of entity.product_categories) {
-                        for (const subCategory of category.subCategories) {
-                            for (const product of subCategory.products) {
-                                if (productIDs.includes(product.id)) {
-                                    filteredProducts.push(product);
+                for (const category of entity.product_categories) {
+                    for (const subCategory of category.subCategories) {
+                        for (const product of subCategory.products) {
+                            if (productIDs.includes(product.id)) {
+                                if (filteredCategories.category) {
+                                    if (filteredCategories.category.subCategory) {
+                                        filteredCategories.category.subcategory.push(product)
+                                    } else {
+                                        filteredCategories.category.subcategory = [product]
+                                    }
+                                } else {
+                                    filteredCategories.category = {
+                                        subCategory: [product]
+                                    }
                                 }
                             }
                         }
                     }
-                    // Send the response with filtered products
-                    res.status(200).json({ info: entity.info, products: filteredProducts });
-                } else {
-                    // Send the response with entity info
-                    res.status(200).json({ info: entity.info });
                 }
+                // Send the response with filtered products
+                res.status(200).json({ info: entity.info, products: filteredCategories });
+            } else {
+                // Send the response with entity info
+                res.status(200).json({ info: entity.info });
+            }
         } else {
             console.log('Find Entity error');
             res.status(404).json({ message: 'Entity not found' });
