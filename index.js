@@ -850,23 +850,19 @@ app.post('/updateCommunityMembers', async (req, res) => {
                 break;
             case 'addBlacklist':
                 if (isBlacklisted) {
-                    return res.status(403).json({ message: 'User/Company already in blacklist' });
-                }
-                // Add the requester to the blacklist
-                const blacklistExists = community.blacklist.some(
-                    blacklistEntry => blacklistEntry.id === requesterId && blacklistEntry.user === user
-                );
-                if (blacklistExists) {
                     return res.status(400).json({ message: user? 'User already in blacklist' : 'Company already in blacklist' });
                 }
 
-                community.blacklist.push({ id: requesterId, user });
+                community.blacklist.push({ id: actionID, user });
                 break;
 
             case 'removeBlacklist':
+                if (!isBlacklisted) {
+                    return res.status(400).json({ message: user? 'User not in blacklist' : 'Company not in blacklist' });
+                }
                 // Remove the requester from the blacklist
                 community.blacklist = community.blacklist.filter(
-                    blacklistEntry => blacklistEntry.id !== requesterId || blacklistEntry.user !== user
+                    blacklistEntry => blacklistEntry.id !== actionID || blacklistEntry.user !== user
                 );
                 break;
 
