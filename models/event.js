@@ -44,6 +44,10 @@ const EventSchema = new mongoose.Schema({
     requests: {
         type: [],
         default: []
+    },
+    blacklist: {
+        type: [],
+        default: []
     }
 })
 
