@@ -279,7 +279,7 @@ app.get('/findEntity', async (req, res) => {
 
 // Find Multiples Entities
 app.get('/findEntities', async (req, res) => {
-    const { entities } = req.query; // expects an array of {id: string, user: boolean}
+    const { entities } = req.body; // expects an array of {id: string, user: boolean}
 
     if (!entities || !Array.isArray(entities)) {
         return res.status(400).json({ message: 'Invalid or missing entities array' });
