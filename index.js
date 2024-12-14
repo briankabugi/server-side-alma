@@ -663,6 +663,20 @@ app.post('/createCommunity', async (req, res) => {
     }
 });
 
+// Find Community
+app.get('/findCommunity/:id', async (req, res) => {
+    try {
+        const community = await Community.findById(req.params.id).select('info')
+        if(community){
+            res.status(200).json({ community: community })
+        } else{
+            res.status(400).message('Community Not Found')
+        }
+    } catch (error) {
+        res.status(500).message('Internal Server Error')
+    }
+});
+
 // Fetch Communities
 app.get('/fetchCommunities', async (req, res) => {
     const { x, y, limit } = req.query;
