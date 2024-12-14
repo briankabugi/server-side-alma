@@ -666,7 +666,7 @@ app.post('/createCommunity', async (req, res) => {
 // Find Community
 app.get('/findCommunity/:id', async (req, res) => {
     try {
-        const community = await Community.findById(req.params.id).select('info')
+        const community = await Community.findById(req.params.id)
         if(community){
             res.status(200).json({ community: community })
         } else{
