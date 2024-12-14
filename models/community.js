@@ -33,7 +33,15 @@ const CommunitySchema = new mongoose.Schema({
         type: [],
         default: []
     },
+    blacklist: {
+        type: [],
+        default: []
+    },
     requests: {
+        type: [],
+        default: []
+    },
+    blacklist: {
         type: [],
         default: []
     },

@@ -703,6 +703,109 @@ app.get('/fetchCommunities', async (req, res) => {
     }
 });
 
+// Manage Community Members
+app.post('/updateCommunityMembers', async (req, res) => {
+    const { communityID, actionID, user, action } = req.body;
+
+    try {
+        // Find the community by ID
+        const community = await Community.findById(communityID);
+        if (!community) {
+            return res.status(404).json({ message: 'Community not found' });
+        }
+
+        // Check if the requester is in the blacklist
+        const isBlacklisted = community.blacklist.some(
+            blacklistEntry => blacklistEntry.id === actionID && blacklistEntry.user === user
+        );
+
+        // Handle different actions
+        switch (action) {
+            case 'request':
+                if (isBlacklisted) {
+                    return res.status(403).json({ message: 'Sorry. We cannot add you to this community' });
+                }
+                // Add the requester to the requests list
+                const requestExists = community.requests.some(
+                    request => request.id === actionID
+                );
+                if (requestExists) {
+                    return res.status(400).json({ message: 'It appears you already requested to join this community' });
+                }
+
+                community.requests.push({ id: actionID, user });
+                break;
+
+            case 'deny':
+                // Remove the requester from the requests list
+                community.requests = community.requests.filter(
+                    request => request.id !== actionID
+                );
+                break;
+
+            case 'accept':
+                // Check if the requester is in the requests list
+                const requestIndex = community.requests.findIndex(
+                    request => request.id === actionID
+                );
+                if (requestIndex === -1) {
+                    return res.status(400).json({ message: 'Please ask the user/company to send a request first' });
+                }
+
+                // Add the requester to the members list
+                const acceptedRequest = community.requests.splice(requestIndex, 1)[0];
+                community.members.push({ id: actionID, user: acceptedRequest.user });
+                break;
+
+            case 'remove':
+                // Remove the requester from the members list
+                const memberIndex = community.members.findIndex(
+                    member => member.id === actionID
+                );
+                if (memberIndex === -1) {
+                    return res.status(400).json({ message: 'User/Company not found in members' });
+                }
+
+                // Remove the member from the members list
+                community.members.splice(memberIndex, 1);
+                break;
+            case 'addBlacklist':
+                if (isBlacklisted) {
+                    return res.status(403).json({ message: 'User/Company already in blacklist' });
+                }
+                // Add the requester to the blacklist
+                const blacklistExists = community.blacklist.some(
+                    blacklistEntry => blacklistEntry.id === requesterId && blacklistEntry.user === user
+                );
+                if (blacklistExists) {
+                    return res.status(400).json({ message: user? 'User already in blacklist' : 'Company already in blacklist' });
+                }
+
+                community.blacklist.push({ id: requesterId, user });
+                break;
+
+            case 'removeBlacklist':
+                // Remove the requester from the blacklist
+                community.blacklist = community.blacklist.filter(
+                    blacklistEntry => blacklistEntry.id !== requesterId || blacklistEntry.user !== user
+                );
+                break;
+
+            default:
+                return res.status(400).json({ message: 'Invalid action' });
+        }
+
+        // Save the updated community document
+        await community.save();
+
+        return res.status(200).json({ message: 'Request processed successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
 // Delete Community
 app.delete('/deleteCommunity', async (req, res) => {
     const { communityID } = req.body;
