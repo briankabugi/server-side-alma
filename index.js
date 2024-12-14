@@ -223,7 +223,7 @@ app.get('/nearbyAgents', async (req, res) => {
     }
 });
 
-// Find Entity
+// Find Single Entity
 app.get('/findEntity', async (req, res) => {
     const { id, isUser, productIDs } = req.query;
 
@@ -273,6 +273,80 @@ app.get('/findEntity', async (req, res) => {
         res.status(404).json({ message: 'Entity not found' });
     } catch (err) {
         // Handle any errors
+        res.status(500).send(err.message);
+    }
+});
+
+// Find Multiples Entities
+app.get('/findEntities', async (req, res) => {
+    const { entities } = req.query; // expects an array of {id: string, user: boolean}
+
+    if (!entities || !Array.isArray(entities)) {
+        return res.status(400).json({ message: 'Invalid or missing entities array' });
+    }
+
+    try {
+        // Separate user and company IDs
+        const userIds = entities.filter(entity => entity.user).map(entity => entity.id);
+        const companyIds = entities.filter(entity => !entity.user).map(entity => entity.id);
+
+        const results = [];
+        
+        // Fetch users in bulk if any user IDs are provided
+        let users = [];
+        if (userIds.length > 0) {
+            users = await User.find({ _id: { $in: userIds } }).lean();
+        }
+
+        // Fetch companies in bulk if any company IDs are provided
+        let companies = [];
+        if (companyIds.length > 0) {
+            companies = await Company.find({ _id: { $in: companyIds } }).lean();
+        }
+
+        // Combine users and companies into the results
+        const userMap = users.reduce((map, user) => {
+            map[user._id] = user;
+            return map;
+        }, {});
+
+        const companyMap = companies.reduce((map, company) => {
+            map[company._id] = company;
+            return map;
+        }, {});
+
+        entities.forEach(entity => {
+            let entityData = null;
+
+            if (entity.user) {
+                // For user type, fetch the corresponding user data
+                entityData = userMap[entity.id];
+            } else {
+                // For company type, fetch the corresponding company data
+                entityData = companyMap[entity.id];
+            }
+
+            if (entityData) {
+                results.push({
+                    id: entity.id,
+                    user: entity.user,
+                    info: entityData.info,
+                });
+            } else {
+                results.push({
+                    id: entity.id,
+                    user: entity.user,
+                    message: 'Entity not found',
+                });
+            }
+        });
+
+        // Return the combined results
+        res.status(200).json({ results });
+
+    } catch (err) {
+        // Handle errors
+        console.error(err);
         res.status(500).send(err.message);
     }
 });
