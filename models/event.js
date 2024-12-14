@@ -40,6 +40,10 @@ const EventSchema = new mongoose.Schema({
     link: {
         type: String,
         required: false
+    },
+    requests: {
+        type: [],
+        default: []
     }
 })
 

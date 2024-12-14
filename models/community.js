@@ -13,10 +13,6 @@ const CommunitySchema = new mongoose.Schema({
         type: Boolean,
         required: true
     },
-    radius: {
-        type: Number,
-        required: true
-    },
     location: {
         type: {},
         required: true
@@ -34,6 +30,10 @@ const CommunitySchema = new mongoose.Schema({
         required: true
     },
     members: {
+        type: [],
+        default: []
+    },
+    requests: {
         type: [],
         default: []
     },
