@@ -953,14 +953,18 @@ app.post('/createEvent', async (req, res) => {
     }
 });
 
-app.get('/findEvent/:id', async(req,res)=>{
-    const event = Event.findById(req.params.id)
-    if(event){
-        return res.status(200).json(event)
-    } else{
-        return res.status(500).json({message: 'Event not  found'})
+app.get('/findEvent/:id', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (event) {
+            return res.status(200).json(event);
+        } else {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error', error: error.message });
     }
-})
+});
 
 // Fetch Events
 app.get('/fetchEvents', async (req, res) => {
