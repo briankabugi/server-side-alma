@@ -953,6 +953,15 @@ app.post('/createEvent', async (req, res) => {
     }
 });
 
+app.get('/findEvent/:id', async(req,res)=>{
+    const event = Event.findById(req.params.id)
+    if(event){
+        return res.status(200).json(event)
+    } else{
+        return res.status(500).json({message: 'Event not  found'})
+    }
+})
+
 // Fetch Events
 app.get('/fetchEvents', async (req, res) => {
     const { x, y, limit } = req.query;
@@ -999,6 +1008,104 @@ app.put('/updateEventInfo', async (req, res) => {
         )
     } catch (error) {
         res.status(500).json({ error: error.message })
+    }
+});
+
+// Manage Community Members
+app.post('/updateEventList', async (req, res) => {
+    const { eventID, actionID, user, action } = req.body;
+
+    try {
+        // Find the community by ID
+        const event = await Event.findById(eventID);
+        if (!event) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+
+        // Check if the requester is in the blacklist
+        const isBlacklisted = event.blacklist.some(
+            blacklistEntry => blacklistEntry.id === actionID && blacklistEntry.user === user
+        );
+
+        // Handle different actions
+        switch (action) {
+            case 'request':
+                if (isBlacklisted) {
+                    return res.status(403).json({ message: 'Sorry. We cannot add you to this event' });
+                }
+                // Add the requester to the requests list
+                const requestExists = event.requests.some(
+                    request => request.id === actionID
+                );
+                if (requestExists) {
+                    return res.status(400).json({ message: 'It appears you already requested to attend this event' });
+                }
+
+                event.requests.push({ id: actionID, user });
+                break;
+
+            case 'deny':
+                // Remove the requester from the requests list
+                event.requests = event.requests.filter(
+                    request => request.id !== actionID
+                );
+                break;
+
+            case 'accept':
+                // Check if the requester is in the requests list
+                const requestIndex = event.requests.findIndex(
+                    request => request.id === actionID
+                );
+                if (requestIndex === -1) {
+                    return res.status(400).json({ message: 'Please ask the user/company to send a request first' });
+                }
+
+                // Add the requester to the members list
+                const acceptedRequest = event.requests.splice(requestIndex, 1)[0];
+                event.attending.push({ id: actionID, user: acceptedRequest.user });
+                break;
+
+            case 'remove':
+                // Remove the requester from the members list
+                const attenderIndex = event.attending.findIndex(
+                    attender => attender.id === actionID
+                );
+                if (attenderIndex === -1) {
+                    return res.status(400).json({ message: 'User/Company not found in attending list' });
+                }
+
+                // Remove the member from the members list
+                event.attending.splice(attenderIndex, 1);
+                break;
+            case 'addBlacklist':
+                if (isBlacklisted) {
+                    return res.status(400).json({ message: user? 'User already in blacklist' : 'Company already in blacklist' });
+                }
+
+                event.blacklist.push({ id: actionID, user });
+                break;
+
+            case 'removeBlacklist':
+                if (!isBlacklisted) {
+                    return res.status(400).json({ message: user? 'User not in blacklist' : 'Company not in blacklist' });
+                }
+                // Remove the requester from the blacklist
+                event.blacklist = event.blacklist.filter(
+                    blacklistEntry => blacklistEntry.id !== actionID || blacklistEntry.user !== user
+                );
+                break;
+
+            default:
+                return res.status(400).json({ message: 'Invalid action' });
+        }
+
+        // Save the updated community document
+        await event.save();
+
+        return res.status(200).json({ message: 'Request processed successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
     }
 });
 
