@@ -290,7 +290,7 @@ app.post('/findEntities', async (req, res) => {
         const companyIds = entities.filter(entity => !entity.user).map(entity => entity.id);
 
         const results = [];
-        
+
         let users = [];
         if (userIds.length > 0) {
             users = await User.find({ _id: { $in: userIds } }).lean();
@@ -732,9 +732,9 @@ app.post('/createCommunity', async (req, res) => {
 app.get('/findCommunity/:id', async (req, res) => {
     try {
         const community = await Community.findById(req.params.id)
-        if(community){
+        if (community) {
             res.status(200).json({ community: community })
-        } else{
+        } else {
             res.status(400).message('Community Not Found')
         }
     } catch (error) {
@@ -850,7 +850,7 @@ app.post('/updateCommunityMembers', async (req, res) => {
                 break;
             case 'addBlacklist':
                 if (isBlacklisted) {
-                    return res.status(400).json({ message: user? 'User already in blacklist' : 'Company already in blacklist' });
+                    return res.status(400).json({ message: user ? 'User already in blacklist' : 'Company already in blacklist' });
                 }
 
                 community.blacklist.push({ id: actionID, user });
@@ -858,7 +858,7 @@ app.post('/updateCommunityMembers', async (req, res) => {
 
             case 'removeBlacklist':
                 if (!isBlacklisted) {
-                    return res.status(400).json({ message: user? 'User not in blacklist' : 'Company not in blacklist' });
+                    return res.status(400).json({ message: user ? 'User not in blacklist' : 'Company not in blacklist' });
                 }
                 // Remove the requester from the blacklist
                 community.blacklist = community.blacklist.filter(
@@ -1083,7 +1083,7 @@ app.post('/updateEventList', async (req, res) => {
                 break;
             case 'addBlacklist':
                 if (isBlacklisted) {
-                    return res.status(400).json({ message: user? 'User already in blacklist' : 'Company already in blacklist' });
+                    return res.status(400).json({ message: user ? 'User already in blacklist' : 'Company already in blacklist' });
                 }
 
                 event.blacklist.push({ id: actionID, user });
@@ -1091,7 +1091,7 @@ app.post('/updateEventList', async (req, res) => {
 
             case 'removeBlacklist':
                 if (!isBlacklisted) {
-                    return res.status(400).json({ message: user? 'User not in blacklist' : 'Company not in blacklist' });
+                    return res.status(400).json({ message: user ? 'User not in blacklist' : 'Company not in blacklist' });
                 }
                 // Remove the requester from the blacklist
                 event.blacklist = event.blacklist.filter(
@@ -1311,7 +1311,12 @@ app.put('/cancelOrder/:id', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         } else {
             try {
-                order.status = 'cancelled';
+
+                if (order.stage < 4) {
+                    order.stage = 0
+                } else {
+                    order.stage = 6
+                }
 
                 // Save the updated User
                 await order.save();
