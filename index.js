@@ -1318,12 +1318,11 @@ app.post('/updateOrderStatus', async (req, res) => {
         }
 
         if (enterpriseID) {
-            // Check if the enterpriseID exists in the enterprises dictionary
-            if (!order.enterprises[enterpriseID]) {
+            if (!order.enterprises.has(enterpriseID)) {
                 return res.status(404).json({ message: 'Enterprise not found' });
             }
-            // Update the status for the specific enterprise
-            order.enterprises[enterpriseID].status = newStatus;
+            const enterprise = order.enterprises.get(enterpriseID); // Get the enterprise object
+            enterprise.status = newStatus;
         } else {
             // Update the general order status
             order.status = newStatus;
@@ -1342,7 +1341,7 @@ app.post('/updateOrderStatus', async (req, res) => {
 // Update Order
 app.put('/cancelOrder/:id', async (req, res) => {
 
-    const {orderID,enterpriseID} = req.body
+    const { orderID, enterpriseID } = req.body
 
     try {
         const order = await Order.findById(req.params.id);
