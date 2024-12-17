@@ -1301,7 +1301,7 @@ app.get('/fetchOrders', async (req, res) => {
     }
 });
 
-// Manage Community Members
+// Manage Order Status
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
 
@@ -1312,17 +1312,24 @@ app.post('/updateOrderStatus', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        if(newStatus){
-            if(enterpriseID){
-                order.enterprises[enterpriseID].status = newStatus
-            } else{
-                order.status = newStatus
-            }
-        } else{
-            return res.status(504).json({ message: 'New Status Required' });
+        // Check if newStatus is provided
+        if (!newStatus) {
+            return res.status(400).json({ message: 'New Status Required' }); // Bad Request
         }
 
-        // Save the updated community document
+        if (enterpriseID) {
+            // Check if the enterpriseID exists in the enterprises dictionary
+            if (!order.enterprises[enterpriseID]) {
+                return res.status(404).json({ message: 'Enterprise not found' });
+            }
+            // Update the status for the specific enterprise
+            order.enterprises[enterpriseID].status = newStatus;
+        } else {
+            // Update the general order status
+            order.status = newStatus;
+        }
+
+        // Save the updated order
         await order.save();
 
         return res.status(200).json({ message: 'Order Status Updated' });
