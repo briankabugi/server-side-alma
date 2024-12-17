@@ -1282,6 +1282,22 @@ app.post('/createOrder', async (req, res) => {
     }
 });
 
+app.post('/updateOrder',async(req,res)=>{
+    const {orderID, updatedOrder} = req.body
+    try {
+        await Order.updateOne(
+            { _id: orderID },
+            { $set: updatedOrder }
+        ).then(
+            res.status(200).json({ message: 'Order Updated' })
+        ).catch(
+            (error) => res.status(500).json({ error: error.message })
+        )
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {
     const ids = req.query.ids; // Retrieve the ids from query parameters
