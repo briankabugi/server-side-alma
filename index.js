@@ -1304,6 +1304,8 @@ app.get('/fetchOrders', async (req, res) => {
 // Update Order
 app.put('/cancelOrder/:id', async (req, res) => {
 
+    const {orderID,enterpriseID} = req.body
+
     try {
         const order = await Order.findById(req.params.id);
 
@@ -1311,12 +1313,7 @@ app.put('/cancelOrder/:id', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         } else {
             try {
-
-                if (order.stage < 4) {
-                    order.stage = 0
-                } else {
-                    order.stage = 6
-                }
+                order.status = 'Cancelled'
 
                 // Save the updated User
                 await order.save();

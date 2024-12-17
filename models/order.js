@@ -13,9 +13,9 @@ const OrderSchema = new mongoose.Schema({
         type: Object,
         required: true
     },
-    stage: {
-        type: Number,
-        default: 1
+    status: {
+        type: String,
+        default: 'Pending'
     },
     agent: {
         type: String,
