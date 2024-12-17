@@ -1301,6 +1301,37 @@ app.get('/fetchOrders', async (req, res) => {
     }
 });
 
+// Manage Community Members
+app.post('/updateOrderStatus', async (req, res) => {
+    const { orderID, enterpriseID, newStatus } = req.body;
+
+    try {
+        // Find the order by ID
+        const order = await Order.findById(orderID);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if(newStatus){
+            if(enterpriseID){
+                order.enterprises[enterpriseID].status = newStatus
+            } else{
+                order.status = newStatus
+            }
+        } else{
+            return res.status(504).json({ message: 'New Status Required' });
+        }
+
+        // Save the updated community document
+        await order.save();
+
+        return res.status(200).json({ message: 'Order Status Updated' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Update Order
 app.put('/cancelOrder/:id', async (req, res) => {
 
