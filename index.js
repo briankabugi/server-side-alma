@@ -193,7 +193,7 @@ app.get('/nearbyAgents', async (req, res) => {
         const allAgents = await User.find({
             agent: {
                 $exists: true,
-                "agent.payload": { $gte: payload }
+                "agent.payload": { $gte: Number(payload) }
             }
         }).select('_id info agent');
 
@@ -201,8 +201,8 @@ app.get('/nearbyAgents', async (req, res) => {
         const agentsWithDistances = allAgents.map(agent => {
             const { latitude, longitude } = agent.info.location;
             const R = 6371; // Radius of the Earth in kilometers
-            const dLat = (x - latitude) * Math.PI / 180;
-            const dLon = (y - longitude) * Math.PI / 180;
+            const dLat = (Number(x) - latitude) * Math.PI / 180;
+            const dLon = (Number(y) - longitude) * Math.PI / 180;
             const a =
                 Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                 Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
