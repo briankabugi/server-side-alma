@@ -185,21 +185,24 @@ app.put('/updateAgent/:id', async (req, res) => {
     }
 });
 
-// Get Nearest Agents
+// Get nearest agents
 app.get('/nearbyAgents', async (req, res) => {
-    const { x, y, limit, payload } = req.query;
+    const { x, y, limit, payload } = req.body;
 
     try {
         const allAgents = await User.find({
-            agent: {
-                $exists: true,
-                "agent.payload": { $gte: Number(payload) }
-            }
+            "agent.payload": { $gte: Number(payload) },
+            "agent": { $exists: true, $ne: null }
         }).select('_id info agent');
 
         // Calculate distances
         const agentsWithDistances = allAgents.map(agent => {
-            const { latitude, longitude } = agent.info.location;
+            // Skip if 'agent' or 'payload' is missing
+            if (!agent.agent || typeof agent.agent.payload === 'undefined') {
+                return null;
+            }
+
+            const { latitude = 0, longitude = 0 } = agent.info.location || {}; // Fallback to 0 if location is missing
             const R = 6371; // Radius of the Earth in kilometers
             const dLat = (Number(x) - latitude) * Math.PI / 180;
             const dLon = (Number(y) - longitude) * Math.PI / 180;
@@ -209,8 +212,9 @@ app.get('/nearbyAgents', async (req, res) => {
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             const distance = R * c;
+
             return { ...agent.toObject(), distance };
-        });
+        }).filter(agent => agent !== null); // Filter out agents without valid payload
 
         // Sort documents by their calculated distances in ascending order
         agentsWithDistances.sort((a, b) => a.distance - b.distance);
@@ -219,10 +223,10 @@ app.get('/nearbyAgents', async (req, res) => {
         const nearbyAgents = agentsWithDistances.slice(0, parseInt(limit));
         res.status(200).json({ nearbyAgents: nearbyAgents });
     } catch (error) {
-        console.error(error.message)
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // Find Single Entity
 app.get('/findEntity', async (req, res) => {
