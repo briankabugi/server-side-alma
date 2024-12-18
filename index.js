@@ -191,8 +191,8 @@ app.get('/nearbyAgents', async (req, res) => {
 
     try {
         const allAgents = await User.find({
-            "agent.payload": { $gte: Number(payload) },
-            "agent": { $exists: true, $ne: null }
+            "agent": { $exists: true, $ne: null },
+            "agent.payload": { $gte: Number(payload) }
         }).select('_id info agent');
 
         // Calculate distances
@@ -223,6 +223,7 @@ app.get('/nearbyAgents', async (req, res) => {
         const nearbyAgents = agentsWithDistances.slice(0, parseInt(limit));
         res.status(200).json({ nearbyAgents: nearbyAgents });
     } catch (error) {
+        console.error(error.message)
         res.status(500).json({ error: error.message });
     }
 });
