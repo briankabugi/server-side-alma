@@ -197,28 +197,29 @@ app.get('/nearbyAgents', async (req, res) => {
             }
         }).select('_id info agent');
 
-        // // Calculate distances
-        // const agentsWithDistances = allAgents.map(agent => {
-        //     const { latitude, longitude } = agent.info.location;
-        //     const R = 6371; // Radius of the Earth in kilometers
-        //     const dLat = (Number(x) - latitude) * Math.PI / 180;
-        //     const dLon = (Number(y) - longitude) * Math.PI / 180;
-        //     const a =
-        //         Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        //         Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
-        //         Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        //     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        //     const distance = R * c;
-        //     return { ...agent.toObject(), distance };
-        // });
+        // Calculate distances
+        const agentsWithDistances = allAgents.map(agent => {
+            const { latitude, longitude } = agent.info.location;
+            const R = 6371; // Radius of the Earth in kilometers
+            const dLat = (Number(x) - latitude) * Math.PI / 180;
+            const dLon = (Number(y) - longitude) * Math.PI / 180;
+            const a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(latitude * Math.PI / 180) * Math.cos(x * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c;
+            return { ...agent.toObject(), distance };
+        });
 
-        // // Sort documents by their calculated distances in ascending order
-        // agentsWithDistances.sort((a, b) => a.distance - b.distance);
+        // Sort documents by their calculated distances in ascending order
+        agentsWithDistances.sort((a, b) => a.distance - b.distance);
 
-        // // Return the top n documents
-        // const nearbyAgents = agentsWithDistances.slice(0, parseInt(limit));
+        // Return the top n documents
+        const nearbyAgents = agentsWithDistances.slice(0, parseInt(limit));
         res.status(200).json({ nearbyAgents: allAgents });
     } catch (error) {
+        console.error(error.message)
         res.status(500).json({ error: error.message });
     }
 });
