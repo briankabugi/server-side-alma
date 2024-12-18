@@ -185,7 +185,7 @@ app.put('/updateAgent/:id', async (req, res) => {
     }
 });
 
-// Get Nearest Users
+// Get Nearest Agents
 app.get('/nearbyAgents', async (req, res) => {
     const { x, y, limit, payload } = req.body;
 

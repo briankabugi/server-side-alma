@@ -18,7 +18,16 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     agent: {
-        type: {},
+        type: {
+            payload: {
+                type: Number,
+                required: true
+            },
+            method: {
+                type: String,
+                required: true
+            }
+        },
         required: false
     }
 })
