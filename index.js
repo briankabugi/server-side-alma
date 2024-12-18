@@ -186,8 +186,8 @@ app.put('/updateAgent/:id', async (req, res) => {
 });
 
 // Get nearest agents
-app.get('/nearbyAgents', async (req, res) => {
-    const { x, y, limit, payload } = req.query;
+app.post('/nearbyAgents', async (req, res) => {
+    const { x, y, limit, payload } = req.body;
 
     try {
         const allAgents = await User.find({
@@ -226,7 +226,6 @@ app.get('/nearbyAgents', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
 
 // Find Single Entity
 app.get('/findEntity', async (req, res) => {
