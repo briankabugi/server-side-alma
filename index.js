@@ -1296,7 +1296,7 @@ app.post('/updateOrder',async(req,res)=>{
     } catch (error) {
         res.status(500).json({ error: error.message })
     }
-})
+});
 
 // Fetch Orders
 app.get('/fetchOrders', async (req, res) => {

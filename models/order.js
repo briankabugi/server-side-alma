@@ -29,6 +29,10 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    bids: {
+        type: [],
+        required: false
+    },
     location: {
         type: {},
         required: true
