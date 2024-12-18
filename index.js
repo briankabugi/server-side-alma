@@ -187,7 +187,7 @@ app.put('/updateAgent/:id', async (req, res) => {
 
 // Get Nearest Users
 app.get('/nearbyAgents', async (req, res) => {
-    const { x, y, limit, payload } = req.query;
+    const { x, y, limit, payload } = req.body;
 
     try {
         const allAgents = await User.find({
