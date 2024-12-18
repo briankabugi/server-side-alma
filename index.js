@@ -217,7 +217,7 @@ app.get('/nearbyAgents', async (req, res) => {
 
         // Return the top n documents
         const nearbyAgents = agentsWithDistances.slice(0, parseInt(limit));
-        res.status(200).json({ nearbyAgents: allAgents });
+        res.status(200).json({ nearbyAgents: nearbyAgents });
     } catch (error) {
         console.error(error.message)
         res.status(500).json({ error: error.message });
