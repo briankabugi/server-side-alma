@@ -198,6 +198,8 @@ app.post('/nearbyAgents', async (req, res) => {
         const agentsWithDistances = allAgents.map(agent => {
             // Skip if 'agent' or 'payload' is missing
             if (!agent.agent || typeof agent.agent.payload === 'undefined') {
+                console.error(error.message)
+                res.status(500).json({ error: error.message });
                 return null;
             }
 
