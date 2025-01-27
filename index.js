@@ -229,6 +229,49 @@ app.post('/nearbyAgents', async (req, res) => {
     }
 });
 
+app.post('/fetchAgent', async (req, res) => {
+    const { id, x, y } = req.body;
+
+    // Input validation for x, y
+    if (isNaN(x) || isNaN(y)) {
+        return res.status(400).json({ error: "Invalid coordinates provided." });
+    }
+
+    try {
+        const agent = await User.findOne({
+            "_id": id,
+            "agent": { $exists: true, $ne: null }
+        }).select('_id info agent');
+
+        if (!agent || !agent.agent || typeof agent.agent.payload === 'undefined') {
+            console.error("Agent or payload missing:", agent);
+            return res.status(500).json({ error: "Agent data or payload is missing." });
+        }
+
+        const { latitude = 0, longitude = 0 } = agent.info.location || {}; // Fallback to 0 if location is missing
+        const R = 6371; // Radius of the Earth in kilometers
+
+        const parsedLat = Number(x);
+        const parsedLon = Number(y);
+
+        const dLat = (parsedLat - latitude) * Math.PI / 180;
+        const dLon = (parsedLon - longitude) * Math.PI / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(latitude * Math.PI / 180) * Math.cos(parsedLat * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
+
+        const agentData = { ...agent.toObject(), distance };
+
+        return res.status(200).json({ agentData });
+    } catch (error) {
+        console.error("Error fetching agent data:", error);
+        return res.status(500).json({ error: error.message });
+    }
+});
+
 // Find Single Entity
 app.get('/findEntity', async (req, res) => {
     const { id, isUser, productIDs } = req.query;
@@ -1288,8 +1331,8 @@ app.post('/createOrder', async (req, res) => {
     }
 });
 
-app.post('/updateOrder',async(req,res)=>{
-    const {orderID, updatedOrder} = req.body
+app.post('/updateOrder', async (req, res) => {
+    const { orderID, updatedOrder } = req.body
     try {
         await Order.updateOne(
             { _id: orderID },
