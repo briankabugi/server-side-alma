@@ -229,8 +229,9 @@ app.post('/nearbyAgents', async (req, res) => {
     }
 });
 
-app.post('/fetchAgent', async (req, res) => {
-    const { id, x, y } = req.body;
+// Fetch Agent Data
+app.get('/fetchAgent', async (req, res) => {
+    const { id, x, y } = req.query; // Get parameters from query string
 
     // Input validation for x, y
     if (isNaN(x) || isNaN(y)) {
