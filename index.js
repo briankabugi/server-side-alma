@@ -11,6 +11,7 @@ const http = require('http')
 const app = express()
 const port = process.env.PORT || 3000
 const cors = require('cors')
+const uuid = require('uuid');
 app.use(cors())
 
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -43,8 +44,27 @@ const Order = require('./models/order')
 // Set Up Servers
 const app_server = http.createServer(app)
 
+// ImageKit Private Key
+const privateKey = 'private_uiQh9bjxEMo+e0EcvmcZQh8/P2E='; //insert your own private key here
+
 app_server.listen(port => {
     console.log('Server Listening on port ', port)
+});
+
+app.get('/auth', function (req, res) {
+  const token = req.query.token || uuid.v4();
+  const expire = req.query.expire || parseInt(Date.now() / 1000) + 2400;
+  const privateAPIKey = `${privateKey}`;
+  const signature = crypto
+    .createHmac('sha1', privateAPIKey)
+    .update(token + expire)
+    .digest('hex');
+  res.status(200);
+  res.send({
+    token,
+    expire,
+    signature,
+  });
 });
 
 // Register User
