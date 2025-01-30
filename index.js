@@ -1389,6 +1389,21 @@ app.get('/fetchOrders', async (req, res) => {
     }
 });
 
+// Fetch Agent Orders
+app.get('/fetchAgentOrders', async (req, res) => {
+    const id = req.query.id; // Retrieve the ids from query parameters
+
+    try {
+
+        const orders = await Order.find({ 'agent': id });
+
+        res.json(orders);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
 // Manage Order Status
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
