@@ -18,7 +18,11 @@ const OrderSchema = new mongoose.Schema({
             },
             products: [{
                 type: String
-            }]
+            }],
+            code: {
+                type: String,
+                required: false
+            }
         })
     },
     status: {
@@ -29,8 +33,26 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    code: {
-        type: String,
+    codes: {
+        type: Map,
+        of: new mongoose.Schema({
+            source: {
+                type: String,
+                required: true
+            },
+            recipient: [{
+                type: String,
+                required: true
+            }],
+            value: {
+                type: String,
+                required: true
+            },
+            scanned: {
+                type: Boolean,
+                default: false
+            }
+        }),
         required: false
     },
     bids: {
@@ -40,6 +62,28 @@ const OrderSchema = new mongoose.Schema({
     location: {
         type: {},
         required: true
+    },
+    disputes: {
+       type: Map,
+        of: new mongoose.Schema({
+            source: {
+                type: String,
+                required: true
+            },
+            recipient: [{
+                type: String,
+                required: true
+            }],
+            cause: {
+                type: String,
+                required: true
+            },
+            solution: {
+                type: String,
+                required: true
+            }
+        }),
+        required: false
     }
 })
 
