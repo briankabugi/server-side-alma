@@ -1422,7 +1422,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             const enterprise = order.enterprises.get(enterpriseID); // Get the enterprise object
             if(newStatus){
                 enterprise.status = newStatus;
-            } else if(code){
+            } else if(newCode){
                 enterprise.code = newCode;
             } else {
                 return res.status(404).json({ message: 'Insufficient Parameters' });
