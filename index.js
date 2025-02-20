@@ -1406,7 +1406,7 @@ app.get('/fetchAgentOrders', async (req, res) => {
 
 // Manage Order Status
 app.post('/updateOrderStatus', async (req, res) => {
-    const { orderID, enterpriseID, newStatus } = req.body;
+    const { orderID, enterpriseID, newStatus, newCode } = req.body;
 
     try {
         // Find the order by ID
@@ -1415,17 +1415,18 @@ app.post('/updateOrderStatus', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        // Check if newStatus is provided
-        if (!newStatus) {
-            return res.status(400).json({ message: 'New Status Required' }); // Bad Request
-        }
-
         if (enterpriseID) {
             if (!order.enterprises.has(enterpriseID)) {
                 return res.status(404).json({ message: 'Enterprise not found' });
             }
             const enterprise = order.enterprises.get(enterpriseID); // Get the enterprise object
-            enterprise.status = newStatus;
+            if(newStatus){
+                enterprise.status = newStatus;
+            } else if(code){
+                enterprise.code = newCode;
+            } else {
+                return res.status(404).json({ message: 'Insufficient Parameters' });
+            }
         } else {
             // Update the general order status
             order.status = newStatus;
