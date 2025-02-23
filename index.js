@@ -1430,19 +1430,19 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                enterprise.status = newStatus; // Fixed assignment here
+                enterprise.status = newStatus;
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
-                    const enterprise = order.enterprises.get(id); // Check this based on whether it's a Map or an object
+                    const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
                         console.error('Enterprise not Found');
                         return res.status(404).json({ message: 'Enterprise not found' });
                     }
-                    enterprise.status = newStatus; // Fixed assignment here
+                    enterprise.status = newStatus;
                 }
             }
         } else {
-            order.status = newStatus; // Update overall order status directly if no enterpriseID provided
+            order.status = newStatus;
         }
 
         console.log('Order Status 1; ', order.status)
@@ -1467,10 +1467,9 @@ app.post('/updateOrderStatus', async (req, res) => {
             console.log('#IN Our Floating Index; ', floatingIndex)
             console.log('#IN Our Current Index; ', currentIndex)
             if (floatingIndex === 2) {
-                // Specific logic for "Waiting Pickup"
                 for (const key of order.enterprises.keys()) {
                     console.log('Second Entity Key; ',  key)
-                    order.enterprises.get(key).status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
+                    order.enterprises.get(key).status = 'Waiting For Pickup';
                 }
                 order.status = 'Waiting For Pickup';
             } else {
