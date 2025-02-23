@@ -1445,29 +1445,36 @@ app.post('/updateOrderStatus', async (req, res) => {
             order.status = newStatus; // Update overall order status directly if no enterpriseID provided
         }
 
-        // Compute Overall Status
-        function computeOverallStatus() {
-            let floatingIndex = 6;
-            const currentIndex = statuses.findIndex((item) => item === order.status);
-            Object.values(order.enterprises).forEach((entity) => {
-                const index = statuses.findIndex((item) => item === entity.status);
-                if (index < floatingIndex) {
-                    floatingIndex = index;
-                }
-            });
+        console.log('Order Status 1; ', order.status)
 
-            if (floatingIndex > currentIndex) {
-                if (floatingIndex === 2) {
-                    // Specific logic for "Waiting Pickup"
-                    for (const entity in order.enterprises) {
-                        order.enterprises[entity].status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
-                    }
-                    order.status = 'Waiting Pickup';
-                } else {
-                    order.status = statuses[floatingIndex];
+        // Compute Overall Status
+        let floatingIndex = 6;
+        const currentIndex = statuses.findIndex((item) => item === order.status);
+        Object.values(order.enterprises).forEach((entity) => {
+            const index = statuses.findIndex((item) => item === entity.status);
+            if (index < floatingIndex) {
+                floatingIndex = index;
+            }
+        });
+
+        console.log('#OUT Our Floating Index; ', floatingIndex)
+        console.log('#OUT Our Current Index; ', currentIndex)
+
+        if (floatingIndex > currentIndex) {
+            console.log('#IN Our Floating Index; ', floatingIndex)
+            console.log('#IN Our Current Index; ', currentIndex)
+            if (floatingIndex === 2) {
+                // Specific logic for "Waiting Pickup"
+                for (const entity in order.enterprises) {
+                    order.enterprises[entity].status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
                 }
+                order.status = 'Waiting Pickup';
+            } else {
+                order.status = statuses[floatingIndex];
             }
         }
+
+        console.log('Order Status 2; ', order.status)
 
         computeOverallStatus()
 
