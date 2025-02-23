@@ -10,8 +10,16 @@ const OrderSchema = new mongoose.Schema({
         required: true
     },
     enterprises: {
-        type: {},
-        required: true
+        type: Map,
+        of: new mongoose.Schema({
+            status: {
+                type: String,
+                default: 'Pending'
+            },
+            products: [{
+                type: String
+            }]
+        })
     },
     status: {
         type: String,
