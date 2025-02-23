@@ -1405,7 +1405,6 @@ app.get('/fetchAgentOrders', async (req, res) => {
 });
 
 // Manage Order Status
-
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
 
@@ -1420,60 +1419,67 @@ app.post('/updateOrderStatus', async (req, res) => {
         const order = await Order.findById(orderID);
 
         if (!order) {
-            console.error('Order not Found')
+            console.error('Order not Found');
             return res.status(404).json({ message: 'Order not found' });
         }
 
+        // Function to compute overall status based on individual enterprise statuses
         function computeOverallStatus() {
-            let floatingIndex = 6
-            
-            const currentIndex = statuses.findIndex((item) => item === order.status)
-            Object.values(order.enterprises).forEach((entity) => {
-                const index = statuses.findIndex((item) => item === entity.status)
-                if (index < floatingIndex) {
-                    floatingIndex = index
-                }
-            })
+            let floatingIndex = 6; // Start with the 'Successful' index
 
-            if (floatingIndex > currentIndex) {
-                if (floatingIndex === 2) {
-                    for (const entity in order.enterprises) {
-                        const enterprise = order.enterprises.get(entity)
-                        enterprise.status = 'Waiting Pickup'
-                    }
-                    order.status = 'Waiting Pickup'
+            const currentIndex = statuses.findIndex((item) => item === order.status);
+
+            // Loop through all enterprise statuses to find the earliest status
+            Object.values(order.enterprises).forEach((entity) => {
+                const index = statuses.findIndex((item) => item === entity.status);
+                if (index < floatingIndex) {
+                    floatingIndex = index; // Update floatingIndex to the lowest index
+                }
+            });
+
+            // If the overall status needs updating, do so
+            if (floatingIndex !== currentIndex) {
+                if (floatingIndex === 3) { // Special case: 'Waiting For Pickup'
+                    order.status = 'Waiting For Pickup';
+                    // Update all enterprise statuses to 'Waiting For Pickup'
+                    Object.values(order.enterprises).forEach((entity) => {
+                        entity.status = 'Waiting For Pickup';
+                    });
                 } else {
-                    order.status = statuses[floatingIndex]
+                    order.status = statuses[floatingIndex];
                 }
             }
         }
 
+        // Update the enterprise status if enterpriseID is provided
         if (enterpriseID) {
             if (typeof (enterpriseID) === 'string') {
                 const enterprise = order.enterprises.get(enterpriseID);
                 if (!enterprise) {
-                    console.error('Enterprise not Found')
+                    console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                enterprise.status = newStatus
+                enterprise.status = newStatus;
             } else if (Array.isArray(enterpriseID)) {
+                // Update multiple enterprise statuses if enterpriseID is an array
                 for (const id of enterpriseID) {
                     const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
-                        console.error('Enterprise not Found')
+                        console.error('Enterprise not Found');
                         return res.status(404).json({ message: 'Enterprise not found' });
                     }
                     enterprise.status = newStatus;
                 }
             }
         } else {
-            order.status = newStatus
+            // If no enterpriseID is provided, update the overall order status
+            order.status = newStatus;
         }
 
-        // Compute Overall Status
-        computeOverallStatus()
+        // Recompute the overall status based on individual enterprise statuses
+        computeOverallStatus();
 
-        // Save the updated order
+        // Save the updated order to the database
         await order.save();
 
         return res.status(200).json({ message: 'Order Status Updated' });
@@ -1482,7 +1488,6 @@ app.post('/updateOrderStatus', async (req, res) => {
         return res.status(500).json({ message: 'Server error' });
     }
 });
-
 // Update Order
 app.put('/cancelOrder/:id', async (req, res) => {
 
