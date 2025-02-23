@@ -1424,20 +1424,19 @@ app.post('/updateOrderStatus', async (req, res) => {
 
         if (enterpriseID) {
             if (typeof (enterpriseID) === 'string') {
-                if (!order.enterprises.has(enterpriseID)) {
+                const enterprise = order.enterprises.get(enterpriseID);
+                if (!enterprise) {
                     console.error('Enterprise not Found')
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                const enterprise = order.enterprises.get(enterpriseID);
                 enterprise.status = newStatus;
-
-            } else if (typeof (enterpriseID) === 'object') {
+            } else if (Array.isArray(enterpriseID)) {
                 for (const id in enterpriseID) {
-                    if (!order.enterprises.has(enterpriseID)) {
+                    const enterprise = order.enterprises.get(id);
+                    if (!enterprise) {
                         console.error('Enterprise not Found')
                         return res.status(404).json({ message: 'Enterprise not found' });
                     }
-                    const enterprise = order.enterprises.get(id);
                     enterprise.status = newStatus;
                 }
             }
