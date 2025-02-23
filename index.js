@@ -1405,7 +1405,6 @@ app.get('/fetchAgentOrders', async (req, res) => {
 });
 
 // Manage Order Status
-
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
 
@@ -1431,7 +1430,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found')
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                enterprise.status === newStatus
+                enterprise.status = newStatus
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
                     const enterprise = order.enterprises.get(id);
@@ -1446,6 +1445,26 @@ app.post('/updateOrderStatus', async (req, res) => {
             order.status = newStatus
         }
 
+        // Compute Overall Status
+        let floatingIndex = 6
+        const currentIndex = statuses.findIndex((item) => item === order.status)
+        Object.values(order.enterprises).forEach((entity) => {
+            const index = statuses.findIndex((item) => item === entity.status)
+            if (index < floatingIndex) {
+                floatingIndex = index
+            }
+        })
+
+        if (floatingIndex > currentIndex) {
+            if (floatingIndex === 2) {
+                for (const entity in order.enterprises) {
+                    order.enterprises.get(entity).status = 'Waiting Pickup'
+                }
+                order.status = 'Waiting Pickup'
+            } else {
+                order.status = statuses[floatingIndex]
+            }
+        }
 
         // Save the updated order
         await order.save();
