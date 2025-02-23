@@ -1410,16 +1410,40 @@ const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Picku
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
 
-    if (!orderID || !newStatus ) {
+    if (!orderID || !newStatus) {
         return res.status(504).json({ message: 'Insufficient Parameters' });
     }
 
     try {
         // Find the order by ID
         const order = await Order.findById(orderID);
+
         if (!order) {
             console.error('Order not Found')
-            return res.status(404).json({ message: 'Order not found' });  
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        function computeOverallStatus() {
+            let floatingIndex = 6
+            const currentIndex = statuses.findIndex((item) => item === order.status)
+            Object.values(order.enterprises).forEach((entity) => {
+                const index = statuses.findIndex((item) => item === entity.status)
+                if (index < floatingIndex) {
+                    floatingIndex = index
+                }
+            })
+
+            if (floatingIndex > currentIndex) {
+                if (floatingIndex === 2) {
+                    for (const entity in order.enterprises) {
+                        const enterprise = order.enterprises.get(entity)
+                        enterprise.status = 'Waiting Pickup'
+                    }
+                    order.status = 'Waiting Pickup'
+                } else {
+                    order.status = statuses[floatingIndex]
+                }
+            }
         }
 
         if (enterpriseID) {
@@ -1429,7 +1453,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found')
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                enterprise.status = newStatus;
+                enterprise.status === newStatus
             } else if (Array.isArray(enterpriseID)) {
                 for (const id in enterpriseID) {
                     const enterprise = order.enterprises.get(id);
@@ -1440,23 +1464,12 @@ app.post('/updateOrderStatus', async (req, res) => {
                     enterprise.status = newStatus;
                 }
             }
-
-            let floatingIndex = 6
-            let currentIndex = statuses.findIndex((status)=>status===order.status)
-
-            for(const enterprise in order.enterprises){
-                const index = statuses.findIndex((status)=>status===enterprise.status)
-                if(index < floatingIndex){
-                    floatingIndex = index
-                }
-            }
-
-            if (floatingIndex != currentIndex){
-                order.status = statuses[floatingIndex]
-            }
         } else {
             order.status = newStatus
         }
+
+        // Compute Overall Status
+        computeOverallStatus()
 
         // Save the updated order
         await order.save();
