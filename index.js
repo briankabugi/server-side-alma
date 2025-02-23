@@ -1424,7 +1424,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        function computeOverallStatus() {
+        async function computeOverallStatus() {
             let floatingIndex = 6
             
             const currentIndex = statuses.findIndex((item) => item === order.status)
@@ -1471,7 +1471,7 @@ app.post('/updateOrderStatus', async (req, res) => {
         }
 
         // Compute Overall Status
-        computeOverallStatus()
+        await computeOverallStatus()
 
         // Save the updated order
         await order.save();
