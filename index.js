@@ -1408,7 +1408,7 @@ app.get('/fetchAgentOrders', async (req, res) => {
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
 
-    const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Successful', 'Cancelled'];
+    const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Completed', 'Cancelled'];
 
     if (!orderID || !newStatus) {
         return res.status(504).json({ message: 'Insufficient Parameters' });
@@ -1453,10 +1453,14 @@ app.post('/updateOrderStatus', async (req, res) => {
         Object.values(order.enterprises).forEach((entity) => {
             console.log('Our Entity; ', entity)
             console.log('Our Status; ', entity.status)
-            const index = statuses.findIndex((item) => item === entity.status);
+            // Convert the Mongoose subdocument to a plain JavaScript object
+            const entityData = entity.toObject();
+
+            const index = statuses.findIndex((item) => item === entityData.status);
             if (index < floatingIndex) {
                 floatingIndex = index;
             }
+            
         });
 
         console.log('#OUT Our Floating Index; ', floatingIndex)
