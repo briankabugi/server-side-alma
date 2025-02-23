@@ -1435,7 +1435,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 }
             })
 
-            if (floatingIndex > currentIndex) {
+            if (floatingIndex != currentIndex) {
                 if (floatingIndex === 2) {
                     for (const entity in order.enterprises) {
                         const enterprise = order.enterprises.get(entity)
