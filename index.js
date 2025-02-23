@@ -1426,6 +1426,7 @@ app.post('/updateOrderStatus', async (req, res) => {
 
         function computeOverallStatus() {
             let floatingIndex = 6
+
             const currentIndex = statuses.findIndex((item) => item === order.status)
             Object.values(order.enterprises).forEach((entity) => {
                 const index = statuses.findIndex((item) => item === entity.status)
@@ -1456,7 +1457,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 }
                 enterprise.status === newStatus
             } else if (Array.isArray(enterpriseID)) {
-                for (const id of enterpriseID) {
+                for (const id in enterpriseID) {
                     const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
                         console.error('Enterprise not Found')
