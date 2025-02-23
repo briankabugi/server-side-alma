@@ -1405,10 +1405,11 @@ app.get('/fetchAgentOrders', async (req, res) => {
 });
 
 // Manage Order Status
-const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Successful', 'Cancelled'];
 
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
+
+    const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Successful', 'Cancelled'];
 
     if (!orderID || !newStatus) {
         return res.status(504).json({ message: 'Insufficient Parameters' });
