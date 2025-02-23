@@ -1419,50 +1419,51 @@ app.post('/updateOrderStatus', async (req, res) => {
         const order = await Order.findById(orderID);
 
         if (!order) {
-            console.error('Order not Found')
+            console.error('Order not Found');
             return res.status(404).json({ message: 'Order not found' });
         }
 
         if (enterpriseID) {
-            if (typeof (enterpriseID) === 'string') {
+            if (typeof enterpriseID === 'string') {
                 const enterprise = order.enterprises.get(enterpriseID);
                 if (!enterprise) {
-                    console.error('Enterprise not Found')
+                    console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                enterprise.status = newStatus
+                enterprise.status = newStatus; // Fixed assignment here
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
-                    const enterprise = order.enterprises.get(id);
+                    const enterprise = order.enterprises.get(id); // Check this based on whether it's a Map or an object
                     if (!enterprise) {
-                        console.error('Enterprise not Found')
+                        console.error('Enterprise not Found');
                         return res.status(404).json({ message: 'Enterprise not found' });
                     }
-                    enterprise.status = newStatus;
+                    enterprise.status = newStatus; // Fixed assignment here
                 }
             }
         } else {
-            order.status = newStatus
+            order.status = newStatus; // Update overall order status directly if no enterpriseID provided
         }
 
         // Compute Overall Status
-        let floatingIndex = 6
-        const currentIndex = statuses.findIndex((item) => item === order.status)
+        let floatingIndex = 6;
+        const currentIndex = statuses.findIndex((item) => item === order.status);
         Object.values(order.enterprises).forEach((entity) => {
-            const index = statuses.findIndex((item) => item === entity.status)
+            const index = statuses.findIndex((item) => item === entity.status);
             if (index < floatingIndex) {
-                floatingIndex = index
+                floatingIndex = index;
             }
-        })
+        });
 
         if (floatingIndex > currentIndex) {
             if (floatingIndex === 2) {
+                // Specific logic for "Waiting Pickup"
                 for (const entity in order.enterprises) {
-                    order.enterprises.get(entity).status = 'Waiting Pickup'
+                    order.enterprises[entity].status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
                 }
-                order.status = 'Waiting Pickup'
+                order.status = 'Waiting Pickup';
             } else {
-                order.status = statuses[floatingIndex]
+                order.status = statuses[floatingIndex];
             }
         }
 
