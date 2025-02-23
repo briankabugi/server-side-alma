@@ -1450,11 +1450,11 @@ app.post('/updateOrderStatus', async (req, res) => {
         // Compute Overall Status
         let floatingIndex = 6;
         const currentIndex = statuses.findIndex((item) => item === order.status);
-        order.enterprises.entries().forEach((entity) => {
+        Array.from(order.enterprises.entries()).forEach((entity) => {
             console.log('Our Entity; ', entity)
-            console.log('Our Status; ', entity[1].status)
+            console.log('Our Status; ', entity.status)
 
-            const index = statuses.findIndex((item) => item === entity[1].status);
+            const index = statuses.findIndex((item) => item === entityData.status);
             if (index < floatingIndex) {
                 floatingIndex = index;
             }
