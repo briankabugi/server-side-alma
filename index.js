@@ -1471,7 +1471,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 for (const entity in order.enterprises) {
                     order.enterprises[entity].status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
                 }
-                order.status = 'Waiting Pickup';
+                order.status = 'Waiting For Pickup';
             } else {
                 order.status = statuses[floatingIndex];
             }
