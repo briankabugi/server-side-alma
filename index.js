@@ -54,19 +54,19 @@ app_server.listen(port => {
 });
 
 app.get('/auth', function (req, res) {
-  const token = req.query.token || uuid.v4();
-  const expire = req.query.expire || parseInt(Date.now() / 1000) + 2400;
-  const privateAPIKey = `${privateKey}`;
-  const signature = crypto
-    .createHmac('sha1', privateAPIKey)
-    .update(token + expire)
-    .digest('hex');
-  res.status(200);
-  res.send({
-    token,
-    expire,
-    signature,
-  });
+    const token = req.query.token || uuid.v4();
+    const expire = req.query.expire || parseInt(Date.now() / 1000) + 2400;
+    const privateAPIKey = `${privateKey}`;
+    const signature = crypto
+        .createHmac('sha1', privateAPIKey)
+        .update(token + expire)
+        .digest('hex');
+    res.status(200);
+    res.send({
+        token,
+        expire,
+        signature,
+    });
 });
 
 // Register User
@@ -1405,8 +1405,14 @@ app.get('/fetchAgentOrders', async (req, res) => {
 });
 
 // Manage Order Status
+const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Successful', 'Cancelled'];
+
 app.post('/updateOrderStatus', async (req, res) => {
-    const { orderID, enterpriseID, newStatus, newCode } = req.body;
+    const { orderID, enterpriseID, newStatus } = req.body;
+
+    if (!orderID || !newStatus ) {
+        return res.status(504).json({ message: 'Insufficient Parameters' });
+    }
 
     try {
         // Find the order by ID
@@ -1416,20 +1422,38 @@ app.post('/updateOrderStatus', async (req, res) => {
         }
 
         if (enterpriseID) {
-            if (!order.enterprises.has(enterpriseID)) {
-                return res.status(404).json({ message: 'Enterprise not found' });
-            }
-            const enterprise = order.enterprises.get(enterpriseID); // Get the enterprise object
-            if(newStatus){
+            if (typeof (enterpriseID) === 'string') {
+                if (!order.enterprises.has(enterpriseID)) {
+                    return res.status(404).json({ message: 'Enterprise not found' });
+                }
+                const enterprise = order.enterprises.get(enterpriseID);
                 enterprise.status = newStatus;
-            } else if(newCode){
-                enterprise.code = newCode;
-            } else {
-                return res.status(404).json({ message: 'Insufficient Parameters' });
+
+            } else if (typeof (enterpriseID) === 'object') {
+                for (const id in enterpriseID) {
+                    if (!order.enterprises.has(enterpriseID)) {
+                        return res.status(404).json({ message: 'Enterprise not found' });
+                    }
+                    const enterprise = order.enterprises.get(id);
+                    enterprise.status = newStatus;
+                }
+            }
+
+            let floatingIndex = 6
+            let currentIndex = statuses.findIndex((status)=>status===order.status)
+
+            for(const enterprise in order.enterprises){
+                const index = statuses.findIndex((status)=>status===enterprise.status)
+                if(index < floatingIndex){
+                    floatingIndex = index
+                }
+            }
+
+            if (floatingIndex != currentIndex){
+                order.status = statuses[floatingIndex]
             }
         } else {
-            // Update the general order status
-            order.status = newStatus;
+            order.status = newStatus
         }
 
         // Save the updated order
