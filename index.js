@@ -1454,7 +1454,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             console.log('Our Entity; ', entity)
             console.log('Our Status; ', entity.status)
 
-            const index = statuses.findIndex((item) => item === entityData.status);
+            const index = statuses.findIndex((item) => item === entity.status);
             if (index < floatingIndex) {
                 floatingIndex = index;
             }
