@@ -1450,7 +1450,7 @@ app.post('/updateOrderStatus', async (req, res) => {
         // Compute Overall Status
         let floatingIndex = 6;
         const currentIndex = statuses.findIndex((item) => item === order.status);
-        Object.values(order.enterprises).forEach((entity) => {
+        Array.from(order.enterprises.entries()).forEach((entity) => {
             console.log('Our Entity; ', entity)
             console.log('Our Status; ', entity.status)
             // Convert the Mongoose subdocument to a plain JavaScript object
