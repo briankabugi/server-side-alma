@@ -1469,7 +1469,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             if (floatingIndex === 2) {
                 // Specific logic for "Waiting Pickup"
                 for (const entity in order.enterprises) {
-                    order.enterprises[entity].status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
+                    order.enterprises.get(entity).status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
                 }
                 order.status = 'Waiting For Pickup';
             } else {
