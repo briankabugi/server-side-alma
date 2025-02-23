@@ -1424,29 +1424,6 @@ app.post('/updateOrderStatus', async (req, res) => {
             return res.status(404).json({ message: 'Order not found' });
         }
 
-        function computeOverallStatus() {
-            let floatingIndex = 6
-            const currentIndex = statuses.findIndex((item) => item === order.status)
-            Object.values(order.enterprises).forEach((entity) => {
-                const index = statuses.findIndex((item) => item === entity.status)
-                if (index < floatingIndex) {
-                    floatingIndex = index
-                }
-            })
-
-            if (floatingIndex > currentIndex) {
-                if (floatingIndex === 2) {
-                    for (const entity in order.enterprises) {
-                        const enterprise = order.enterprises.get(entity)
-                        enterprise.status = 'Waiting Pickup'
-                    }
-                    order.status = 'Waiting Pickup'
-                } else {
-                    order.status = statuses[floatingIndex]
-                }
-            }
-        }
-
         if (enterpriseID) {
             if (typeof (enterpriseID) === 'string') {
                 const enterprise = order.enterprises.get(enterpriseID);
@@ -1470,7 +1447,25 @@ app.post('/updateOrderStatus', async (req, res) => {
         }
 
         // Compute Overall Status
-        computeOverallStatus()
+        let floatingIndex = 6
+        const currentIndex = statuses.findIndex((item) => item === order.status)
+        Object.values(order.enterprises).forEach((entity) => {
+            const index = statuses.findIndex((item) => item === entity.status)
+            if (index < floatingIndex) {
+                floatingIndex = index
+            }
+        })
+
+        if (floatingIndex > currentIndex) {
+            if (floatingIndex === 2) {
+                for (const entity in order.enterprises) {
+                    order.enterprises.get(entity).status = 'Waiting Pickup'
+                }
+                order.status = 'Waiting Pickup'
+            } else {
+                order.status = statuses[floatingIndex]
+            }
+        }
 
         // Save the updated order
         await order.save();
