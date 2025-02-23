@@ -1408,7 +1408,7 @@ app.get('/fetchAgentOrders', async (req, res) => {
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
 
-    const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Completed', 'Cancelled'];
+    const statuses = new Set(['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Completed', 'Cancelled']);
 
     if (!orderID || !newStatus) {
         return res.status(504).json({ message: 'Insufficient Parameters' });
@@ -1450,11 +1450,12 @@ app.post('/updateOrderStatus', async (req, res) => {
         // Compute Overall Status
         let floatingIndex = 6;
         const currentIndex = statuses.findIndex((item) => item === order.status);
-        Array.from(order.enterprises.entries()).forEach((entity) => {
-            console.log('Our Entity; ', entity)
-            console.log('Our Status; ', entity[1].status)
+        order.enterprises.forEach((entity) => {
+            console.log('Our Entity: ', entity);
+            console.log('Our Status: ', entity[1].status);
 
-            const index = statuses.findIndex((item) => item === entity[1].status);
+            // Only check for the status in the Set and then find the index if needed
+            const index = statuses.indexOf(entity[1].status);
             if (index < floatingIndex) {
                 floatingIndex = index;
             }
