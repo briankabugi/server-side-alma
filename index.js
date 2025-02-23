@@ -1476,10 +1476,6 @@ app.post('/updateOrderStatus', async (req, res) => {
 
         console.log('Order Status 2; ', order.status)
 
-        computeOverallStatus()
-
-        console.log('Order Status 3; ', order.status)
-
         // Save the updated order
         await order.save();
 
