@@ -1453,10 +1453,8 @@ app.post('/updateOrderStatus', async (req, res) => {
         Array.from(order.enterprises.entries()).forEach((entity) => {
             console.log('Our Entity; ', entity)
             console.log('Our Status; ', entity.status)
-            // Convert the Mongoose subdocument to a plain JavaScript object
-            const entityData = entity.get()
 
-            const index = statuses.findIndex((item) => item === entityData.status);
+            const index = statuses.findIndex((item) => item === entity.status);
             if (index < floatingIndex) {
                 floatingIndex = index;
             }
