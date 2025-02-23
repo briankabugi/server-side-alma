@@ -1446,7 +1446,8 @@ app.post('/updateOrderStatus', async (req, res) => {
         }
 
         // Compute Overall Status
-        let floatingIndex = 6;
+        async function computeOverallStatus(){
+            let floatingIndex = 6;
         const currentIndex = statuses.findIndex((item) => item === order.status);
         Object.values(order.enterprises).forEach((entity) => {
             const index = statuses.findIndex((item) => item === entity.status);
@@ -1466,6 +1467,9 @@ app.post('/updateOrderStatus', async (req, res) => {
                 order.status = statuses[floatingIndex];
             }
         }
+        }
+
+        await computeOverallStatus()
 
         // Save the updated order
         await order.save();
