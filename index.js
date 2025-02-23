@@ -1468,8 +1468,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             console.log('#IN Our Current Index; ', currentIndex)
             if (floatingIndex === 2) {
                 // Specific logic for "Waiting Pickup"
-                for (const [key,value] of order.enterprises) {
-                    console.log('Second Entity Key; ',  key)
+                for (const key of order.enterprises.keys()) {
                     console.log('Second Entity Key; ',  key)
                     order.enterprises.get(key).status = 'Waiting Pickup'; // Fixed here, accessing enterprises object
                 }
