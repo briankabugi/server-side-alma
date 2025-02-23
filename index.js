@@ -1456,7 +1456,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 }
                 enterprise.status === newStatus
             } else if (Array.isArray(enterpriseID)) {
-                for (const id in enterpriseID) {
+                for (const id of enterpriseID) {
                     const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
                         console.error('Enterprise not Found')
