@@ -1418,12 +1418,14 @@ app.post('/updateOrderStatus', async (req, res) => {
         // Find the order by ID
         const order = await Order.findById(orderID);
         if (!order) {
-            return res.status(404).json({ message: 'Order not found' });
+            console.error('Order not Found')
+            return res.status(404).json({ message: 'Order not found' });  
         }
 
         if (enterpriseID) {
             if (typeof (enterpriseID) === 'string') {
                 if (!order.enterprises.has(enterpriseID)) {
+                    console.error('Enterprise not Found')
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
                 const enterprise = order.enterprises.get(enterpriseID);
@@ -1432,6 +1434,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             } else if (typeof (enterpriseID) === 'object') {
                 for (const id in enterpriseID) {
                     if (!order.enterprises.has(enterpriseID)) {
+                        console.error('Enterprise not Found')
                         return res.status(404).json({ message: 'Enterprise not found' });
                     }
                     const enterprise = order.enterprises.get(id);
