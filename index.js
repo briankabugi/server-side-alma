@@ -1435,6 +1435,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 for (const id of enterpriseID) {
                     console.log('Received ID; ',enterpriseID)
                     console.log('Loop ID; ',  id)
+                    console.log('Enterprise Keys; ', Object.keys(order.enterprises))
                     const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
                         console.error('Enterprise not Found');
