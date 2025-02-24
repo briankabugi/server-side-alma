@@ -651,28 +651,32 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
 // Update Company Data
 app.put('/updateCompanyData/:id', async (req, res) => {
     const { categories, images } = req.body;
-    const id = req.params.id
+    const id = req.params.id;
 
     try {
-        const company = await Company.findById(id);
+        // Use findByIdAndUpdate with $set for efficient partial updates
+        const updatedCompany = await Company.findByIdAndUpdate(
+            id,
+            {
+                $set: {
+                    'product_categories': categories,
+                    'info.images': images,
+                    // Add other properties to be updated here
+                }
+            },
+            { new: true } // Return the updated document
+        );
 
-        if (!company) {
-            res.status(404).json({ error: 'Company not found' });
-        } else {
-            company.product_categories = categories
-            company.info.images = images
-            // Update other properties as needed
-
-            // Save the updated Company
-            await company.save().then(() => {
-                res.status(200).json({ message: 'Changes Saved' });
-            }).catch((error) => {
-                res.status(500).json({ message: `Failed to save data on server: ${error.message}` })
-            });
+        if (!updatedCompany) {
+            // Return 404 error if the company was not found
+            return res.status(404).json({ error: 'Company not found' });
         }
+
+        // Return a success response with the updated company data
+        res.status(200).json({ message: 'Changes Saved', updatedCompany });
     } catch (error) {
-        res.status(500).json({ error: error.message });
-        console.error(error.message)
+        console.error('Error Updating Data:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
