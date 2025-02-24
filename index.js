@@ -416,31 +416,25 @@ app.post('/findEntities', async (req, res) => {
 
 // Update User Info
 app.put('/updateUserInfo/:id', async (req, res) => {
-    const updatedInfo = req.body; // The updated Company data
+    const updatedInfo = req.body; // The updated User data
 
     try {
-        const user = await User.findById(req.params.id);
+        // Using findByIdAndUpdate with $set to update specific fields
+        const user = await User.findByIdAndUpdate(
+            req.params.id,
+            { $set: { info: updatedInfo } }
+        );
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
-            try {
-                user.info = updatedInfo;
-
-                // Save the updated User
-                await user.save();
-
-                res.status(200).json({ message: 'Saved' })
-            } catch (error) {
-                res.status(500).json({ error: error.message })
-            }
-
+            res.status(200).json({ message: 'User info updated'});
         }
-
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 });
+
 
 //Update Locations
 app.put('/updateUserLocations/:id', async (req, res) => {
