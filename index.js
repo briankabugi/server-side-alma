@@ -619,12 +619,20 @@ app.get('/findCompanies/:userId', async (req, res) => {
 // Update Company Info
 app.put('/updateCompanyInfo/:id', async (req, res) => {
     const info = req.body; // The updated Company data
+    const updateFields = {};
+
+    // Iterate through the fields in the new data and add them to the update object
+    for (const key in info) {
+        if (info.hasOwnProperty(key)) {
+            updateFields[`info.${key}`] = info[key];
+        }
+    }
 
     try {
         // Use findByIdAndUpdate with $set for efficient partial updates
         const updatedCompany = await Company.findByIdAndUpdate(
             req.params.id,
-            { $set: { info } }, // Only update the 'info' field
+            { $set: updateFields }, // Update only the specified fields
         );
 
         if (!updatedCompany) {
