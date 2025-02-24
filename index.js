@@ -584,7 +584,6 @@ app.post('/createCompany', async (req, res) => {
         const newCompany = req.body;
 
         newCompany.code = await bcrypt.hash(newCompany.code, 5);
-        newCompany.info.logo = Buffer.from(newCompany.info.logo, 'base64');
 
         // Create New Company Object
         const createdCompany = new Company(newCompany);
