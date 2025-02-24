@@ -626,7 +626,6 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
         const updatedCompany = await Company.findByIdAndUpdate(
             req.params.id,
             { $set: { info } }, // Only update the 'info' field
-            { new: true } // Return the updated document
         );
 
         if (!updatedCompany) {
@@ -635,9 +634,9 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
         }
 
         // Return a success response
-        res.json({ message: 'Company info updated successfully', company: updatedCompany });
+        res.json({ message: 'Info Updated'});
     } catch (error) {
-        console.error('Error updating Company:', error);
+        console.error('Error Updating Info:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
 });
