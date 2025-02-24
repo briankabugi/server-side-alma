@@ -650,21 +650,13 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
 
 // Update Company Data
 app.put('/updateCompanyData/:id', async (req, res) => {
-    const { categories, images } = req.body;
+    const updatedData = req.body;
     const id = req.params.id;
 
     try {
         // Use findByIdAndUpdate with $set for efficient partial updates
         const updatedCompany = await Company.findByIdAndUpdate(
-            id,
-            {
-                $set: {
-                    'product_categories': categories,
-                    'info.images': images,
-                    // Add other properties to be updated here
-                }
-            },
-            { new: true } // Return the updated document
+            id,{ $set: updatedData}
         );
 
         if (!updatedCompany) {
@@ -673,7 +665,7 @@ app.put('/updateCompanyData/:id', async (req, res) => {
         }
 
         // Return a success response with the updated company data
-        res.status(200).json({ message: 'Changes Saved', updatedCompany });
+        res.status(200).json({ message: 'Data Updated' });
     } catch (error) {
         console.error('Error Updating Data:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
