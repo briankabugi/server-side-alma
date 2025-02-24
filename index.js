@@ -622,23 +622,20 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
     const info = req.body; // The updated Company data
 
     try {
-        const company = await Company.findById(req.params.id);
+        // Use findByIdAndUpdate with $set for efficient partial updates
+        const updatedCompany = await Company.findByIdAndUpdate(
+            req.params.id,
+            { $set: { info } }, // Only update the 'info' field
+            { new: true } // Return the updated document
+        );
 
-        if (!company) {
-            // Return 404 error
+        if (!updatedCompany) {
+            // Return 404 error if the company was not found
             return res.status(404).json({ error: 'Company not found' });
-        } else {
-            // Update the Company with the new data
-            company.info = info
         }
 
-        // Save the updated Company
-        await company.save().then(() => {
-            res.json({ message: 'Saved' });
-        }).catch((error) => {
-            res.status(500).json({ message: error.message })
-        });;
-
+        // Return a success response
+        res.json({ message: 'Company info updated successfully', company: updatedCompany });
     } catch (error) {
         console.error('Error updating Company:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
