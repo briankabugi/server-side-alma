@@ -428,7 +428,7 @@ app.put('/updateUserInfo/:id', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         } else {
-            res.status(200).json({ message: 'User info updated'});
+            res.status(200).json({ message: 'User info updated' });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -641,7 +641,7 @@ app.put('/updateCompanyInfo/:id', async (req, res) => {
         }
 
         // Return a success response
-        res.json({ message: 'Info Updated'});
+        res.json({ message: 'Info Updated' });
     } catch (error) {
         console.error('Error Updating Info:', error);
         return res.status(500).json({ error: 'Internal Server Error' });
@@ -654,9 +654,33 @@ app.put('/updateCompanyData/:id', async (req, res) => {
     const id = req.params.id;
 
     try {
-        // Use findByIdAndUpdate with $set for efficient partial updates
+        const updateFields = Object.keys(updatedData).reduce((acc, key) => {
+            const value = payload[key];
+            const parts = key.split('.');
+            const lastPart = parts[parts.length - 1];
+
+            if (value === null) {
+                // If the value is null, we need to delete the key (or array element)
+                if (Number(lastPart) >= 0) {
+                    // It's an array index, so use $pull to remove the element
+                    const path = parts.slice(0, -1).join('.');
+                    acc[path] = acc[path] || { $pull: {} };
+                    acc[path].$pull[lastPart] = "";  // Remove the element at the index
+                } else {
+                    // It's a key in an object, so use $unset to delete the key
+                    acc[key] = "";  // This will be interpreted as $unset by MongoDB
+                }
+            } else {
+                // If the value is not null, use $set to update the key
+                acc[key] = value;  // This will be interpreted as $set by MongoDB
+            }
+
+            return acc;
+        }, {});
+
         const updatedCompany = await Company.findByIdAndUpdate(
-            id,{ $set: updatedData}
+            id,
+            updateFields
         );
 
         if (!updatedCompany) {
@@ -1426,8 +1450,8 @@ app.post('/updateOrderStatus', async (req, res) => {
                 enterprise.status = newStatus;
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
-                    console.log('Received ID; ',enterpriseID)
-                    console.log('Loop ID; ',  id)
+                    console.log('Received ID; ', enterpriseID)
+                    console.log('Loop ID; ', id)
                     console.log('Enterprise Keys; ', order.enterprises.keys())
                     const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
@@ -1464,7 +1488,7 @@ app.post('/updateOrderStatus', async (req, res) => {
             console.log('#IN Our Current Index; ', currentIndex)
             if (floatingIndex === 2) {
                 for (const key of order.enterprises.keys()) {
-                    console.log('Second Entity Key; ',  key)
+                    console.log('Second Entity Key; ', key)
                     order.enterprises.get(key).status = 'Waiting For Pickup';
                 }
                 order.status = 'Waiting For Pickup';
