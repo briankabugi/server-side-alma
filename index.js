@@ -655,7 +655,7 @@ app.put('/updateCompanyData/:id', async (req, res) => {
 
     try {
         const updateFields = Object.keys(updatedData).reduce((acc, key) => {
-            const value = payload[key];
+            const value = updatedData[key];
             const parts = key.split('.');
             const lastPart = parts[parts.length - 1];
 
