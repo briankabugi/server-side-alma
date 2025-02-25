@@ -665,10 +665,10 @@ app.put('/updateCompanyData/:id', async (req, res) => {
                     // It's an array index, so use $pull to remove the element
                     const path = parts.slice(0, -1).join('.');
                     acc[path] = acc[path] || { $pull: {} };
-                    acc[path].$pull[lastPart] = 1;  // Ensure we're pulling the element by index
+                    acc[path].$pull = { [lastPart]: 1 };  // Correctly remove element at index
                 } else {
                     // It's a key in an object, so use $unset to delete the key
-                    acc[key] = "";  // MongoDB will interpret this as $unset
+                    acc[key] = "";  // This will be interpreted as $unset by MongoDB
                 }
             } else {
                 // If the value is not null, use $set to update the key
