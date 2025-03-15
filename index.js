@@ -740,6 +740,7 @@ app.get('/popularCompanies', (req, res) => {
             res.status(200).json(documentsWithDistances);
         })
         .catch(error => {
+            console.error('Error Fetching Popular',error.message)
             res.status(500).json({ error: error.message });
         });
 });
@@ -781,6 +782,7 @@ app.get('/nearbyCompanies', async (req, res) => {
         const nearestDocs = docsWithDistances.slice(0, limit);
         res.json(nearestDocs);
     } catch (error) {
+        console.error('Error Fetching Nearby',error.message)
         res.status(500).json({ error: error.message });
     }
 });
