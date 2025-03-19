@@ -17,7 +17,7 @@ const CommunitySchema = new mongoose.Schema({
         type: {},
         required: true
     },
-    logo: {
+    image: {
         type: String,
         required: true
     },
