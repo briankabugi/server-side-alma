@@ -1102,6 +1102,7 @@ app.put('/updateEventInfo/:id', async (req, res) => {
             (error) => res.status(500).json({ error: error.message })
         )
     } catch (error) {
+        console.error('Error Updating Event; ', error.message)
         res.status(500).json({ error: error.message })
     }
 });
