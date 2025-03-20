@@ -5,7 +5,7 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    posters: {
+    images: {
         type: [],
         required: true
     },
