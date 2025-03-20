@@ -1089,12 +1089,12 @@ app.get('/fetchEvents', async (req, res) => {
 });
 
 // Update Community
-app.put('/updateEventInfo', async (req, res) => {
+app.put('/updateEventInfo/:id', async (req, res) => {
     const { updatedInfo } = req.body; // The updated Company data
 
     try {
         await Event.updateOne(
-            { _id: updatedInfo._id },
+            { _id: request.params.id },
             { $set: updatedInfo }
         ).then(
             res.status(200).json({ message: 'Event Updated' })
