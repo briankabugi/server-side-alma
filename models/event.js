@@ -29,7 +29,7 @@ const EventSchema = new mongoose.Schema({
         type: [],
         default: []
     },
-    openAccess: {
+    public: {
         type: Boolean,
         required: true
     },
