@@ -48,6 +48,10 @@ const EventSchema = new mongoose.Schema({
     blacklist: {
         type: [],
         default: []
+    },
+    contact: {
+        type: {},
+        required: true
     }
 })
 
