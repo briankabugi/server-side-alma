@@ -1094,7 +1094,7 @@ app.put('/updateEventInfo/:id', async (req, res) => {
 
     try {
         await Event.updateOne(
-            { _id: request.params.id },
+            { _id: req.params.id },
             { $set: updatedInfo }
         ).then(
             res.status(200).json({ message: 'Event Updated' })
