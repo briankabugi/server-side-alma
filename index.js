@@ -13,6 +13,7 @@ const port = process.env.PORT || 3000
 const cors = require('cors')
 const uuid = require('uuid');
 const crypto = require('crypto');
+const websocket = require('ws');
 
 app.use(cors())
 
@@ -48,6 +49,24 @@ const app_server = http.createServer(app)
 
 // ImageKit Private Key
 const privateKey = 'private_uiQh9bjxEMo+e0EcvmcZQh8/P2E='; //insert your own private key here
+
+// Websocket Server
+const wss = new websocket.Server({ server: app_server });
+
+// Establish Websocket Connection
+wss.on('connection', (ws) => {
+
+    console.log('A new client connected');
+    ws.send('Hello from WebSocket server!');
+
+    ws.on('message', function incoming(message) {
+        console.log('received: %s', message);
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+});
 
 app_server.listen(port => {
     console.log('Server Listening on port ', port)
@@ -740,7 +759,7 @@ app.get('/popularCompanies', (req, res) => {
             res.status(200).json(documentsWithDistances);
         })
         .catch(error => {
-            console.error('Error Fetching Popular',error.message)
+            console.error('Error Fetching Popular', error.message)
             res.status(500).json({ error: error.message });
         });
 });
@@ -782,7 +801,7 @@ app.get('/nearbyCompanies', async (req, res) => {
         const nearestDocs = docsWithDistances.slice(0, limit);
         res.json(nearestDocs);
     } catch (error) {
-        console.error('Error Fetching Nearby',error.message)
+        console.error('Error Fetching Nearby', error.message)
         res.status(500).json({ error: error.message });
     }
 });
