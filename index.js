@@ -9,7 +9,6 @@ const bcrypt = require('bcrypt');
 const http = require('http')
 
 const app = express()
-const port = process.env.PORT || 3000
 const cors = require('cors')
 const uuid = require('uuid');
 const crypto = require('crypto');
@@ -64,8 +63,10 @@ wss.on('connection', (ws) => {
     });
 });
 
-app_server.listen(port => {
-    console.log('Server Listening on port ', port)
+const PORT = process.env.PORT || 3000;
+
+app_server.listen(PORT, () => {
+  console.log(`Server Listening on port ${PORT}`);
 });
 
 app.get('/auth', function (req, res) {
