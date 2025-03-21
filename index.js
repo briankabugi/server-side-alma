@@ -102,7 +102,7 @@ app.post('/register', async (req, res) => {
 
     //Save to database
     newUser.save().then(() => {
-        const token = jwt.sign({ userID: newUser._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
+        const token = jwt.sign({ userID: newUser._id }, 'Q&r2k6vhv$h12kl', { expiresIn: '1h' })
         res.status(200).json({ userID: newUser._id, token: token })
     }).catch((error) => {
         console.log('Could not create Account', error)
