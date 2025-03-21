@@ -25,7 +25,7 @@ const jwt = require('jsonwebtoken')
 
 // Connect to Database
 mongoose.connect(
-    'mongodb+srv://corporationlighthouse:<db_password>@cluster0.mojqd5l.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+    'mongodb+srv://corporationlighthouse:JUQfQlkkVeSAOOWF@cluster0.mojqd5l.mongodb.net/'
 ).then(() => {
     console.log('Connected to Mongo')
 }).catch((error) => {
