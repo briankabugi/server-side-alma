@@ -66,7 +66,7 @@ wss.on('connection', (ws) => {
 const PORT = process.env.PORT || 3000;
 
 app_server.listen(PORT, () => {
-  console.log(`Server Listening on port ${PORT}`);
+    console.log(`Server Listening on port ${PORT}`);
 });
 
 app.get('/auth', function (req, res) {
@@ -1466,7 +1466,11 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                enterprise.status = newStatus;
+                if (newStatus === 'Ready To Deliver' && order.enterprises.length === 1) {
+                    enterprise.status = 'Waiting For Pickup'
+                } else {
+                    enterprise.status = newStatus;
+                }
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
                     console.log('Received ID; ', enterpriseID)
