@@ -1443,40 +1443,27 @@ app.get('/fetchAgentOrders', async (req, res) => {
 // Manage Order Status
 app.post('/updateOrderStatus', async (req, res) => {
     const { orderID, enterpriseID, newStatus } = req.body;
-
     const statuses = ['Pending', 'Packaging', 'Ready To Deliver', 'Waiting For Pickup', 'In Delivery', 'Completed', 'Cancelled'];
-
     if (!orderID || !newStatus) {
         return res.status(504).json({ message: 'Insufficient Parameters' });
     }
-
     try {
         // Find the order by ID
         const order = await Order.findById(orderID);
-
         if (!order) {
-            console.error('Order not Found');
             return res.status(404).json({ message: 'Order not found' });
         }
-
         if (enterpriseID) {
             if (typeof enterpriseID === 'string') {
                 const enterprise = order.enterprises.get(enterpriseID);
                 if (!enterprise) {
-                    console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                console.log('Keys Method Result; ', order.enterprises.keys(), ' Of Type; ', typeof order.enterprises.keys())
-                console.log('ObjectKeys Result; ', Object.keys(order.enterprises), ' Of Type; ', Object.keys(order.enterprises))
                 enterprise.status = newStatus
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
-                    console.log('Received ID; ', enterpriseID)
-                    console.log('Loop ID; ', id)
-                    console.log('Enterprise Keys; ', order.enterprises.keys())
                     const enterprise = order.enterprises.get(id);
                     if (!enterprise) {
-                        console.error('Enterprise not Found');
                         return res.status(404).json({ message: 'Enterprise not found' });
                     }
                     enterprise.status = newStatus;
@@ -1485,52 +1472,32 @@ app.post('/updateOrderStatus', async (req, res) => {
         } else {
             order.status = newStatus;
         }
-
-        console.log('Order Status 1; ', order.status)
-
         // Compute Overall Status
         let floatingIndex = 6;
         const currentIndex = statuses.findIndex((item) => item === order.status);
         order.enterprises.forEach((entity) => {
-            console.log('Our Entity: ', entity);
-            console.log('Our Status: ', entity.status);
-
             const index = statuses.indexOf(entity.status);
             if (index < floatingIndex) {
                 floatingIndex = index;
             }
         });
-
-        console.log('#OUT Our Floating Index; ', floatingIndex)
-        console.log('#OUT Our Current Index; ', currentIndex)
-
         if (floatingIndex > currentIndex) {
-            console.log('#IN Our Floating Index; ', floatingIndex)
-            console.log('#IN Our Current Index; ', currentIndex)
             if (floatingIndex === 2) {
                 for (const key of order.enterprises.keys()) {
-                    console.log('Second Entity Key; ', key)
                     order.enterprises.get(key).status = 'Waiting For Pickup';
                 }
-
                 order.status = 'Waiting For Pickup';
                 await order.save();
-
                 return res.status(226).json({ message: 'Order Status Updated' });
             } else {
                 order.status = statuses[floatingIndex];
             }
         }
-
-        console.log('Order Status 2; ', order.status)
-
         // Save the updated order
         await order.save();
-
         return res.status(200).json({ message: 'Order Status Updated' });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: `Server error; ${error}` });
     }
 });
 
