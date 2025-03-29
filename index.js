@@ -1466,11 +1466,37 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-                
+
                 console.log('Server New Status; ', newStatus)
                 console.log('Server Old Status; ', enterprise.status)
-                console.log('Enterprise Length; ', order.enterprises.length)
-                if (newStatus === 'Ready To Deliver' && order.enterprises.length === 1) {
+
+                // Measure time for Object.keys()
+                const startKeys = performance.now();
+                const numItemsKeys = Object.keys(order.enterprises).length;
+                const endKeys = performance.now();
+                const timeKeys = endKeys - startKeys;
+
+                // Measure time for for...in loop
+                const startForIn = performance.now();
+                let numItemsForIn = 0;
+                for (const key in order.enterprises) {
+                    if (largeObject.hasOwnProperty(key)) {
+                        numItemsForIn++;
+                    }
+                }
+                const endForIn = performance.now();
+                const timeForIn = endForIn - startForIn;
+
+                // Log the time differences and results
+                console.log(`Object.keys() took: ${timeKeys.toFixed(4)} milliseconds`);
+                console.log(`for...in loop took: ${timeForIn.toFixed(4)} milliseconds`);
+
+                // Optional: Log the number of items to verify correctness
+                console.log("Number of items (Object.keys()):", numItemsKeys);
+                console.log("Number of items (for...in):", numItemsForIn);
+
+
+                if (newStatus === 'Ready To Deliver' && numItemsForIn === 1) {
                     console.log('Went Into Statement')
                     enterprise.status = 'Waiting For Pickup'
 
