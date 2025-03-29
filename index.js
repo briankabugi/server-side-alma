@@ -1472,7 +1472,7 @@ app.post('/updateOrderStatus', async (req, res) => {
 
                 // Measure time for Object.keys()
                 const startKeys = performance.now();
-                const numItemsKeys = Object.keys(order.enterprises).length;
+                const numItemsKeys = order.enterprises.keys().length;
                 const endKeys = performance.now();
                 const timeKeys = endKeys - startKeys;
 
@@ -1480,7 +1480,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 const startForIn = performance.now();
                 let numItemsForIn = 0;
                 for (const key in order.enterprises) {
-                    if (largeObject.hasOwnProperty(key)) {
+                    if (order.enterprises.hasOwnProperty(key)) {
                         numItemsForIn++;
                     }
                 }
@@ -1495,19 +1495,7 @@ app.post('/updateOrderStatus', async (req, res) => {
                 console.log("Number of items (Object.keys()):", numItemsKeys);
                 console.log("Number of items (for...in):", numItemsForIn);
 
-
-                if (newStatus === 'Ready To Deliver' && numItemsForIn === 1) {
-                    console.log('Went Into Statement')
-                    enterprise.status = 'Waiting For Pickup'
-
-                    order.status = 'Waiting For Pickup'
-                    // Save the updated order
-                    await order.save();
-
-                    return res.status(226).json({ message: 'Order Status Updated' });
-                } else {
-                    enterprise.status = newStatus;
-                }
+                enterprise.status = newStatus
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
                     console.log('Received ID; ', enterpriseID)
@@ -1551,7 +1539,11 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.log('Second Entity Key; ', key)
                     order.enterprises.get(key).status = 'Waiting For Pickup';
                 }
+                
                 order.status = 'Waiting For Pickup';
+                await order.save();
+
+                return res.status(200).json({ message: 'Order Status Updated' });
             } else {
                 order.status = statuses[floatingIndex];
             }
