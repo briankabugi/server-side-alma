@@ -1468,6 +1468,12 @@ app.post('/updateOrderStatus', async (req, res) => {
                 }
                 if (newStatus === 'Ready To Deliver' && order.enterprises.length === 1) {
                     enterprise.status = 'Waiting For Pickup'
+
+                    order.status = 'Waiting For Pickup'
+                    // Save the updated order
+                    await order.save();
+
+                    return res.status(226).json({ message: 'Order Status Updated' });
                 } else {
                     enterprise.status = newStatus;
                 }
