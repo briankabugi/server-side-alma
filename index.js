@@ -1466,7 +1466,12 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
+                
+                console.log('Server New Status; ', newStatus)
+                console.log('Server Old Status; ', enterprise.status)
+                console.log('Enterprise Length; ', order.enterprises.length)
                 if (newStatus === 'Ready To Deliver' && order.enterprises.length === 1) {
+                    console.log('Went Into Statement')
                     enterprise.status = 'Waiting For Pickup'
 
                     order.status = 'Waiting For Pickup'
