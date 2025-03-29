@@ -1466,35 +1466,8 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.error('Enterprise not Found');
                     return res.status(404).json({ message: 'Enterprise not found' });
                 }
-
-                console.log('Server New Status; ', newStatus)
-                console.log('Server Old Status; ', enterprise.status)
-
-                // Measure time for Object.keys()
-                const startKeys = performance.now();
-                const numItemsKeys = order.enterprises.keys().length;
-                const endKeys = performance.now();
-                const timeKeys = endKeys - startKeys;
-
-                // Measure time for for...in loop
-                const startForIn = performance.now();
-                let numItemsForIn = 0;
-                for (const key in order.enterprises) {
-                    if (order.enterprises.hasOwnProperty(key)) {
-                        numItemsForIn++;
-                    }
-                }
-                const endForIn = performance.now();
-                const timeForIn = endForIn - startForIn;
-
-                // Log the time differences and results
-                console.log(`Object.keys() took: ${timeKeys.toFixed(4)} milliseconds`);
-                console.log(`for...in loop took: ${timeForIn.toFixed(4)} milliseconds`);
-
-                // Optional: Log the number of items to verify correctness
-                console.log("Number of items (Object.keys()):", numItemsKeys);
-                console.log("Number of items (for...in):", numItemsForIn);
-
+                console.log('Keys Method Result; ', order.enterprises.keys(), ' Of Type; ', typeof order.enterprises.keys())
+                console.log('ObjectKeys Result; ', Object.keys(order.enterprises), ' Of Type; ', Object.keys(order.enterprises))
                 enterprise.status = newStatus
             } else if (Array.isArray(enterpriseID)) {
                 for (const id of enterpriseID) {
@@ -1539,11 +1512,11 @@ app.post('/updateOrderStatus', async (req, res) => {
                     console.log('Second Entity Key; ', key)
                     order.enterprises.get(key).status = 'Waiting For Pickup';
                 }
-                
+
                 order.status = 'Waiting For Pickup';
                 await order.save();
 
-                return res.status(200).json({ message: 'Order Status Updated' });
+                return res.status(226).json({ message: 'Order Status Updated' });
             } else {
                 order.status = statuses[floatingIndex];
             }
