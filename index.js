@@ -1284,9 +1284,9 @@ app.get('/search', async (req, res) => {
 });
 
 // Fetch User Messages
-app.get('/fetchMessages', async (req, res) => {
+app.post('/fetchMessages', async (req, res) => {
     try {
-        const { id } = req.query;
+        const { id } = req.body;
 
         // Fetch all messages sent or received by the user
         const messages = await Message.find({
@@ -1294,6 +1294,48 @@ app.get('/fetchMessages', async (req, res) => {
         });
 
         res.status(200).json({ messages: messages });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Fetch User Messages for multiple users
+app.post('/fetchAllMessages', async (req, res) => {
+    try {
+        const { ids } = req.body;  // ids will be an array of user IDs
+
+        // Ensure ids is an array and contains values
+        if (!Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'Invalid or empty list of IDs' });
+        }
+
+        // Fetch all messages for the provided list of ids
+        const messages = await Message.find({
+            $or: [
+                { 'sender.id': { $in: ids } },
+                { 'receiver.id': { $in: ids } }
+            ]
+        });
+
+        // Group messages by user ID (both sender and receiver)
+        const messagesById = messages.reduce((acc, message) => {
+            // Check if the sender id is in the list of ids
+            if (ids.includes(message.sender.id)) {
+                acc[message.sender.id] = acc[message.sender.id] || [];
+                acc[message.sender.id].push(message);
+            }
+
+            // Check if the receiver id is in the list of ids
+            if (ids.includes(message.receiver.id)) {
+                acc[message.receiver.id] = acc[message.receiver.id] || [];
+                acc[message.receiver.id].push(message);
+            }
+
+            return acc;
+        }, {});
+
+        res.status(200).json(messagesById);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Server error' });
