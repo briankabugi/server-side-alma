@@ -361,6 +361,7 @@ app.post('/findEntity', async (req, res) => {
         res.status(404).json({ message: 'Entity not found' });
     } catch (err) {
         // Handle any errors
+        console.error(err.message)
         res.status(500).send(err.message);
     }
 });
@@ -1320,17 +1321,19 @@ app.post('/fetchAllMessages', async (req, res) => {
 
         // Group messages by user ID (both sender and receiver)
         const messagesById = messages.reduce((acc, message) => {
+            let newMessage = { ...message.toObject() }; // Create a copy of the message
+
             // Check if the sender id is in the list of ids
-            if (ids.includes(message.sender.id)) {
-                const id = message.sender.id;
-                delete message.sender
+            if (ids.includes(newMessage.sender.id)) {
+                const id = newMessage.sender.id;
+                delete newMessage.sender; // Remove sender field
                 acc[id] = acc[id] || [];
-                acc[id].push(message);
-            } else{
-                const id = message.receiver.id;
-                delete message.receiver
+                acc[id].push(newMessage);
+            } else {
+                const id = newMessage.receiver.id;
+                delete newMessage.receiver; // Remove receiver field
                 acc[id] = acc[id] || [];
-                acc[id].push(message);
+                acc[id].push(newMessage);
             }
 
             return acc;
