@@ -1322,14 +1322,15 @@ app.post('/fetchAllMessages', async (req, res) => {
         const messagesById = messages.reduce((acc, message) => {
             // Check if the sender id is in the list of ids
             if (ids.includes(message.sender.id)) {
-                acc[message.sender.id] = acc[message.sender.id] || [];
-                acc[message.sender.id].push(message);
-            }
-
-            // Check if the receiver id is in the list of ids
-            if (ids.includes(message.receiver.id)) {
-                acc[message.receiver.id] = acc[message.receiver.id] || [];
-                acc[message.receiver.id].push(message);
+                const id = message.sender.id;
+                delete message.sender
+                acc[id] = acc[id] || [];
+                acc[id].push(message);
+            } else{
+                const id = message.receiver.id;
+                delete message.receiver
+                acc[id] = acc[id] || [];
+                acc[id].push(message);
             }
 
             return acc;
