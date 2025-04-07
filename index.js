@@ -1303,7 +1303,7 @@ app.post('/fetchMessages', async (req, res) => {
 // Fetch User Messages for multiple users
 app.post('/fetchAllMessages', async (req, res) => {
     try {
-        const { ids } = req.body;  // ids will be an array of user IDs
+        const ids = req.body;
 
         // Ensure ids is an array and contains values
         if (!Array.isArray(ids) || ids.length === 0) {
