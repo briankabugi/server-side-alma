@@ -312,8 +312,8 @@ app.get('/fetchAgent', async (req, res) => {
 });
 
 // Find Single Entity
-app.get('/findEntity', async (req, res) => {
-    const { id, isUser, productIDs } = req.query;
+app.post('/findEntity', async (req, res) => {
+    const { id, isUser, productIDs } = req.body;
 
     try {
         let entity;
